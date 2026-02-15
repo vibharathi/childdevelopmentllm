@@ -8,6 +8,7 @@ from rank_bm25 import BM25Okapi
 import numpy as np
 from typing import List, Dict, Tuple
 import time
+from src.safety.content_filter import ContentFilter
 
 
 class HybridRetriever:
@@ -21,7 +22,8 @@ class HybridRetriever:
     def __init__(self,
                  model_name: str = "all-MiniLM-L6-v2",
                  bm25_weight: float = 0.5,
-                 embedding_weight: float = 0.5):
+                 embedding_weight: float = 0.5,
+                 use_safety_filter: bool = True):
         """
         Initialize the hybrid retriever.
 
@@ -29,6 +31,7 @@ class HybridRetriever:
             model_name: Sentence-transformer model name
             bm25_weight: Weight for BM25 scores (0-1)
             embedding_weight: Weight for embedding scores (0-1)
+            use_safety_filter: Whether to apply content filtering
         """
         print(f"Loading embedding model: {model_name}...")
         self.model = SentenceTransformer(model_name)
@@ -38,7 +41,11 @@ class HybridRetriever:
         self.embeddings = None
         self.bm25 = None
         self.tokenized_corpus = None
+        self.use_safety_filter = use_safety_filter
+        self.content_filter = ContentFilter() if use_safety_filter else None
         print(f"Hybrid retriever initialized (BM25: {bm25_weight}, Embedding: {embedding_weight})")
+        if use_safety_filter:
+            print("Safety filter: ENABLED")
 
     def index_documents(self, chunks: List[Dict]):
         """
@@ -111,6 +118,17 @@ class HybridRetriever:
         # Retrieve chunks and scores
         retrieved_chunks = [self.chunks[idx] for idx in top_indices]
         scores = [float(hybrid_scores[idx]) for idx in top_indices]
+
+        # Apply safety filter if enabled
+        if self.use_safety_filter and self.content_filter:
+            original_count = len(retrieved_chunks)
+            retrieved_chunks, scores, reasons = self.content_filter.filter_chunks(
+                retrieved_chunks, scores
+            )
+            if reasons:
+                print(f"  [Safety Filter] Removed {original_count - len(retrieved_chunks)} low-quality documents")
+                for reason in reasons:
+                    print(f"    - {reason}")
 
         retrieval_time = time.time() - start_time
 

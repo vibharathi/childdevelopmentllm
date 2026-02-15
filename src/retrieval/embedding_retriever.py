@@ -7,6 +7,7 @@ from sentence_transformers import SentenceTransformer
 import numpy as np
 from typing import List, Dict, Tuple
 import time
+from src.safety.content_filter import ContentFilter
 
 
 class EmbeddingRetriever:
@@ -17,18 +18,23 @@ class EmbeddingRetriever:
     then retrieves based on cosine similarity.
     """
 
-    def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
+    def __init__(self, model_name: str = "all-MiniLM-L6-v2", use_safety_filter: bool = True):
         """
         Initialize the embedding retriever.
 
         Args:
             model_name: Sentence-transformer model name
+            use_safety_filter: Whether to apply content filtering
         """
         print(f"Loading embedding model: {model_name}...")
         self.model = SentenceTransformer(model_name)
         self.chunks = []
         self.embeddings = None
+        self.use_safety_filter = use_safety_filter
+        self.content_filter = ContentFilter() if use_safety_filter else None
         print(f"Model loaded! Embedding dimension: {self.model.get_sentence_embedding_dimension()}")
+        if use_safety_filter:
+            print("Safety filter: ENABLED")
 
     def index_documents(self, chunks: List[Dict]):
         """
@@ -81,6 +87,17 @@ class EmbeddingRetriever:
         # Retrieve chunks and scores
         retrieved_chunks = [self.chunks[idx] for idx in top_indices]
         scores = [float(similarities[idx]) for idx in top_indices]
+
+        # Apply safety filter if enabled
+        if self.use_safety_filter and self.content_filter:
+            original_count = len(retrieved_chunks)
+            retrieved_chunks, scores, reasons = self.content_filter.filter_chunks(
+                retrieved_chunks, scores
+            )
+            if reasons:
+                print(f"  [Safety Filter] Removed {original_count - len(retrieved_chunks)} low-quality documents")
+                for reason in reasons:
+                    print(f"    - {reason}")
 
         retrieval_time = time.time() - start_time
 
