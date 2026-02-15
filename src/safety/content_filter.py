@@ -29,7 +29,11 @@ class ContentFilter:
         r"warning:",
         r"this information may be",
         r"unverified",
-        r"not endorsed"
+        r"not endorsed",
+        r"anecdotal",
+        r"not part of.*standardized",
+        r"not part of.*framework",
+        r"not.*established.*guideline"
     ]
 
     # Medically implausible milestone claims (age in months)
