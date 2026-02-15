@@ -11,17 +11,20 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.utils.data_loader import load_milestone_data
 from src.generation.llm import LocalLLM
+from src.retrieval.embedding_retriever import EmbeddingRetriever
+from src.retrieval.hybrid_retriever import HybridRetriever
 
 
 class ChildDevelopmentQA:
     """Main Q&A system for child development questions."""
 
-    def __init__(self, model_path: str = "data/models/tinyllama.gguf"):
+    def __init__(self, model_path: str = "data/models/tinyllama.gguf", strategy: str = "embedding"):
         """
         Initialize the Q&A system.
 
         Args:
             model_path: Path to the LLM model
+            strategy: Retrieval strategy ('embedding' or 'hybrid')
         """
         print("="*60)
         print("CHILD DEVELOPMENT Q&A SYSTEM")
@@ -29,14 +32,26 @@ class ChildDevelopmentQA:
         print("="*60)
 
         # Load milestone data
-        print("\n[1/3] Loading milestone data...")
+        print("\n[1/4] Loading milestone data...")
         self.documents, self.chunks = load_milestone_data()
 
+        # Initialize retrieval strategy
+        print(f"\n[2/4] Initializing retrieval strategy: {strategy.upper()}...")
+        if strategy == "embedding":
+            self.retriever = EmbeddingRetriever()
+        elif strategy == "hybrid":
+            self.retriever = HybridRetriever()
+        else:
+            raise ValueError(f"Unknown strategy: {strategy}. Use 'embedding' or 'hybrid'")
+
+        self.retriever.index_documents(self.chunks)
+        self.strategy = strategy
+
         # Initialize LLM
-        print("\n[2/3] Loading language model...")
+        print("\n[3/4] Loading language model...")
         self.llm = LocalLLM(model_path=model_path)
 
-        print("\n[3/3] System ready!")
+        print("\n[4/4] System ready!")
         print("="*60)
 
     def simple_retrieval(self, question: str, top_k: int = 3):
@@ -88,15 +103,17 @@ class ChildDevelopmentQA:
         Returns:
             Dictionary with answer and metadata
         """
-        # Retrieve relevant chunks
-        retrieved_chunks = self.simple_retrieval(question, top_k=3)
+        # Retrieve relevant chunks using selected strategy
+        retrieved_chunks, scores, retrieval_time = self.retriever.retrieve(question, top_k=3)
 
-        if not retrieved_chunks:
+        if not retrieved_chunks or scores[0] < 0.3:  # Low confidence threshold
             return {
                 'answer': "I don't have specific information about that in my knowledge base. "
                          "Please try asking about developmental milestones for children aged 0-36 months.",
                 'sources': [],
-                'confidence': 'low'
+                'confidence': 'low',
+                'retrieval_time': retrieval_time,
+                'strategy': self.strategy
             }
 
         # Combine retrieved text as context
@@ -109,15 +126,27 @@ class ChildDevelopmentQA:
         sources = [
             {
                 'filename': chunk['source'],
-                'age_range': chunk['age_range']
+                'age_range': chunk['age_range'],
+                'score': score
             }
-            for chunk in retrieved_chunks
+            for chunk, score in zip(retrieved_chunks, scores)
         ]
+
+        # Calculate confidence based on retrieval scores
+        avg_score = sum(scores) / len(scores)
+        if avg_score > 0.6:
+            confidence = 'high'
+        elif avg_score > 0.4:
+            confidence = 'medium'
+        else:
+            confidence = 'low'
 
         return {
             'answer': answer,
             'sources': sources,
-            'confidence': 'high' if len(retrieved_chunks) >= 2 else 'medium'
+            'confidence': confidence,
+            'retrieval_time': retrieval_time,
+            'strategy': self.strategy
         }
 
     def interactive_mode(self):
@@ -152,10 +181,11 @@ class ChildDevelopmentQA:
                 print("-"*60)
                 for source in result['sources']:
                     age_str = f" (Age: {source['age_range']} months)" if source['age_range'] else ""
-                    print(f"  • {source['filename']}{age_str}")
+                    score_str = f" [score: {source['score']:.3f}]" if 'score' in source else ""
+                    print(f"  • {source['filename']}{age_str}{score_str}")
 
                 print("\n" + "-"*60)
-                print(f"Confidence: {result['confidence']}")
+                print(f"Strategy: {result['strategy']} | Confidence: {result['confidence']} | Retrieval: {result['retrieval_time']*1000:.2f}ms")
                 print("-"*60)
 
             except KeyboardInterrupt:
@@ -179,10 +209,11 @@ class ChildDevelopmentQA:
         print("="*60)
         for source in result['sources']:
             age_str = f" (Age: {source['age_range']} months)" if source['age_range'] else ""
-            print(f"  • {source['filename']}{age_str}")
+            score_str = f" [score: {source['score']:.3f}]" if 'score' in source else ""
+            print(f"  • {source['filename']}{age_str}{score_str}")
 
         print("\n" + "="*60)
-        print(f"Confidence: {result['confidence']}")
+        print(f"Strategy: {result['strategy']} | Confidence: {result['confidence']} | Retrieval: {result['retrieval_time']*1000:.2f}ms")
         print("="*60)
 
 
@@ -198,6 +229,13 @@ def main():
         help='Path to LLM model file'
     )
     parser.add_argument(
+        '--strategy',
+        type=str,
+        choices=['embedding', 'hybrid'],
+        default='embedding',
+        help='Retrieval strategy: embedding (dense vectors) or hybrid (BM25 + embeddings)'
+    )
+    parser.add_argument(
         '--question',
         type=str,
         help='Ask a single question and exit'
@@ -206,7 +244,7 @@ def main():
     args = parser.parse_args()
 
     # Initialize system
-    qa_system = ChildDevelopmentQA(model_path=args.model)
+    qa_system = ChildDevelopmentQA(model_path=args.model, strategy=args.strategy)
 
     # Run in appropriate mode
     if args.question:
