@@ -10,7 +10,7 @@ import os
 class LocalLLM:
     """Wrapper for local LLM using llama-cpp-python."""
 
-    def __init__(self, model_path: str = "data/models/tinyllama.gguf", n_ctx: int = 2048, n_threads: int = 4):
+    def __init__(self, model_path: str = "data/models/llama-3.2-3b.gguf", n_ctx: int = 2048, n_threads: int = 4):
         """
         Initialize the local LLM.
 
@@ -60,6 +60,36 @@ class LocalLLM:
 
         return response['choices'][0]['text'].strip()
 
+    def chat(
+        self,
+        messages: List[Dict[str, str]],
+        max_tokens: int = 256,
+        temperature: float = 0.7
+    ) -> str:
+        """
+        Chat-style completion with message history.
+
+        Args:
+            messages: List of message dicts with 'role' and 'content'
+                     Roles: 'system', 'user', 'assistant'
+                     Example: [
+                         {"role": "system", "content": "You are a helpful assistant."},
+                         {"role": "user", "content": "Hello!"}
+                     ]
+            max_tokens: Maximum tokens to generate
+            temperature: Sampling temperature (0.0-1.0)
+
+        Returns:
+            Generated response
+        """
+        response = self.llm.create_chat_completion(
+            messages=messages,
+            max_tokens=max_tokens,
+            temperature=temperature
+        )
+
+        return response['choices'][0]['message']['content'].strip()
+
     def generate_answer(
         self,
         question: str,
@@ -68,6 +98,7 @@ class LocalLLM:
     ) -> str:
         """
         Generate an answer based on question and retrieved context.
+        Uses simple Q&A format which works better for smaller models.
 
         Args:
             question: User's question
@@ -77,24 +108,17 @@ class LocalLLM:
         Returns:
             Generated answer
         """
-        prompt = self._create_qa_prompt(question, context)
-        answer = self.generate(prompt, max_tokens=max_tokens, temperature=0.3)
-        return answer
+        # Use simple Q&A format which works better than chat format for this model
+        prompt = f"""Answer the following question based on the provided context about child development.
 
-    def _create_qa_prompt(self, question: str, context: str) -> str:
-        """Create a prompt for question answering."""
-        prompt = f"""<|system|>
-You are a helpful assistant specializing in early childhood development (ages 0-36 months).
-Answer caregiver questions based ONLY on the provided context about developmental milestones.
-Be warm, supportive, and factual. If the context doesn't contain enough information, say so.
-Remember: you provide general developmental information, not medical advice.</s>
-<|user|>
 Context: {context}
 
-Question: {question}</s>
-<|assistant|>
-"""
-        return prompt
+Question: {question}
+
+Answer:"""
+
+        response = self.generate(prompt, max_tokens=max_tokens, temperature=0.3)
+        return response
 
 
 def test_llm():
@@ -106,13 +130,13 @@ def test_llm():
     # Initialize LLM
     llm = LocalLLM()
 
-    # Test 1: Simple generation
-    print("\nTest 1: Simple Generation")
+    # Test 1: Simple generation using chat
+    print("\nTest 1: Simple Chat Generation")
     print("-" * 60)
-    prompt = "Q: What is 2+2?\nA:"
-    response = llm.generate(prompt, max_tokens=50)
-    print(f"Prompt: {prompt}")
-    print(f"Response: {response}")
+    messages = [{"role": "user", "content": "What is 2+2?"}]
+    response = llm.llm.create_chat_completion(messages=messages, max_tokens=50)
+    print(f"Question: What is 2+2?")
+    print(f"Response: {response['choices'][0]['message']['content'].strip()}")
 
     # Test 2: Child development question with context
     print("\n\nTest 2: Child Development Q&A")

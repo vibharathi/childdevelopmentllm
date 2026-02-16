@@ -13,12 +13,13 @@ from src.utils.data_loader import load_milestone_data
 from src.generation.llm import LocalLLM
 from src.retrieval.embedding_retriever import EmbeddingRetriever
 from src.retrieval.hybrid_retriever import HybridRetriever
+from src.retrieval.chroma_retriever import ChromaRetriever
 
 
 class ChildDevelopmentQA:
     """Main Q&A system for child development questions."""
 
-    def __init__(self, model_path: str = "data/models/tinyllama.gguf", strategy: str = "embedding"):
+    def __init__(self, model_path: str = "data/models/llama-3.2-3b.gguf", strategy: str = "embedding"):
         """
         Initialize the Q&A system.
 
@@ -38,7 +39,11 @@ class ChildDevelopmentQA:
         # Initialize retrieval strategy
         print(f"\n[2/4] Initializing retrieval strategy: {strategy.upper()}...")
         if strategy == "embedding":
-            self.retriever = EmbeddingRetriever()
+            # Use ChromaDB for persistent embedding storage
+            self.retriever = ChromaRetriever(
+                collection_name="child_development",
+                persist_dir="./data/chroma_db"
+            )
         elif strategy == "hybrid":
             self.retriever = HybridRetriever()
         else:
@@ -225,7 +230,7 @@ def main():
     parser.add_argument(
         '--model',
         type=str,
-        default='data/models/tinyllama.gguf',
+        default='data/models/llama-3.2-3b.gguf',
         help='Path to LLM model file'
     )
     parser.add_argument(
