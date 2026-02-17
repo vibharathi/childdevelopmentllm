@@ -9,6 +9,11 @@ import numpy as np
 from typing import List, Dict, Tuple
 import time
 from src.safety.content_filter import ContentFilter
+from src.retrieval.age_utils import (
+    add_age_metadata_to_chunks,
+    extract_age_from_query,
+    get_age_matched_indices
+)
 
 
 class HybridRetriever:
@@ -81,6 +86,9 @@ class HybridRetriever:
         print(f"Indexing {len(chunks)} clean chunks with hybrid approach...")
         start_time = time.time()
 
+        # Add age metadata for filtering
+        add_age_metadata_to_chunks(chunks)
+
         self.chunks = chunks
         texts = [chunk['text'] for chunk in chunks]
 
@@ -106,7 +114,10 @@ class HybridRetriever:
 
     def retrieve(self, query: str, top_k: int = 3) -> Tuple[List[Dict], List[float], float]:
         """
-        Retrieve most relevant chunks using hybrid scoring.
+        Retrieve most relevant chunks using hybrid scoring with age-aware filtering.
+
+        If the query contains an age (e.g., "6 month old"), only documents
+        with matching age ranges are considered.
 
         Args:
             query: User's question
@@ -120,9 +131,45 @@ class HybridRetriever:
 
         start_time = time.time()
 
-        # BM25 scores
-        tokenized_query = query.lower().split()
-        bm25_scores = self.bm25.get_scores(tokenized_query)
+        # Extract age from query for age-aware filtering
+        query_age = extract_age_from_query(query)
+
+        # Filter by age if specified
+        if query_age is not None:
+            # Get indices of age-matched chunks using shared utility
+            age_matched_indices = get_age_matched_indices(self.chunks, query_age)
+
+            if not age_matched_indices:
+                # No age matches found, return empty results
+                print(f"  [Age Filter] No documents found for age {query_age} months")
+                return [], [], time.time() - start_time
+
+            print(f"  [Age Filter] Filtering for age {query_age} months ({len(age_matched_indices)}/{len(self.chunks)} matches)")
+
+            # Filter tokenized corpus for BM25
+            filtered_tokenized_corpus = [self.tokenized_corpus[i] for i in age_matched_indices]
+            filtered_bm25 = BM25Okapi(filtered_tokenized_corpus)
+
+            # Filter embeddings
+            filtered_embeddings = self.embeddings[age_matched_indices]
+
+            # Calculate scores on filtered set
+            tokenized_query = query.lower().split()
+            bm25_scores = filtered_bm25.get_scores(tokenized_query)
+
+            query_embedding = self.model.encode(query, convert_to_numpy=True)
+            embedding_scores = self._cosine_similarity(query_embedding, filtered_embeddings)
+        else:
+            # No age filtering, use all chunks
+            age_matched_indices = list(range(len(self.chunks)))
+
+            # BM25 scores
+            tokenized_query = query.lower().split()
+            bm25_scores = self.bm25.get_scores(tokenized_query)
+
+            # Embedding similarity scores
+            query_embedding = self.model.encode(query, convert_to_numpy=True)
+            embedding_scores = self._cosine_similarity(query_embedding, self.embeddings)
 
         # Normalize BM25 scores to 0-1 range
         if bm25_scores.max() > 0:
@@ -130,22 +177,21 @@ class HybridRetriever:
         else:
             bm25_scores_norm = bm25_scores
 
-        # Embedding similarity scores
-        query_embedding = self.model.encode(query, convert_to_numpy=True)
-        embedding_scores = self._cosine_similarity(query_embedding, self.embeddings)
-
         # Combine scores
         hybrid_scores = (
             self.bm25_weight * bm25_scores_norm +
             self.embedding_weight * embedding_scores
         )
 
-        # Get top-k indices
-        top_indices = np.argsort(hybrid_scores)[::-1][:top_k]
+        # Get top-k indices (relative to filtered set)
+        top_relative_indices = np.argsort(hybrid_scores)[::-1][:top_k]
+
+        # Map back to original chunk indices
+        top_indices = [age_matched_indices[i] for i in top_relative_indices]
 
         # Retrieve chunks and scores
         retrieved_chunks = [self.chunks[idx] for idx in top_indices]
-        scores = [float(hybrid_scores[idx]) for idx in top_indices]
+        scores = [float(hybrid_scores[idx]) for idx in top_relative_indices]
 
         retrieval_time = time.time() - start_time
 

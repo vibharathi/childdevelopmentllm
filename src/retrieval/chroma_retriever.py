@@ -7,67 +7,11 @@ import chromadb
 from chromadb.config import Settings
 from typing import List, Dict, Tuple, Optional
 import time
-import re
 from src.safety.content_filter import ContentFilter
-
-
-def parse_age_range(age_range_str: Optional[str]) -> Tuple[Optional[int], Optional[int]]:
-    """
-    Parse age range string into min and max ages.
-
-    Args:
-        age_range_str: Age range like "2-4", "0-2", "12-18", etc.
-
-    Returns:
-        Tuple of (min_age, max_age) or (None, None) if parsing fails
-
-    Examples:
-        "2-4" -> (2, 4)
-        "0-2" -> (0, 2)
-        "12-18" -> (12, 18)
-    """
-    if not age_range_str:
-        return None, None
-
-    # Match patterns like "2-4" or "0-2"
-    match = re.match(r'^(\d+)-(\d+)$', age_range_str.strip())
-    if match:
-        min_age = int(match.group(1))
-        max_age = int(match.group(2))
-        return min_age, max_age
-
-    return None, None
-
-
-def extract_age_from_query(query: str) -> Optional[int]:
-    """
-    Extract age in months from a user query.
-
-    Args:
-        query: User's question
-
-    Returns:
-        Age in months, or None if no age found
-
-    Examples:
-        "what do 2 month olds do" -> 2
-        "6 month old baby" -> 6
-        "what can a 12-month-old do" -> 12
-        "newborn abilities" -> None
-    """
-    query_lower = query.lower()
-
-    # Pattern 1: "N month" or "N-month"
-    match = re.search(r'(\d+)[-\s]month', query_lower)
-    if match:
-        return int(match.group(1))
-
-    # Pattern 2: "N months"
-    match = re.search(r'(\d+)\s+months', query_lower)
-    if match:
-        return int(match.group(1))
-
-    return None
+from src.retrieval.age_utils import (
+    add_age_metadata_to_chunks,
+    extract_age_from_query
+)
 
 
 class ChromaRetriever:
@@ -162,6 +106,9 @@ class ChromaRetriever:
         print(f"Indexing {len(chunks)} clean chunks into ChromaDB...")
         start_time = time.time()
 
+        # Add age metadata for filtering
+        add_age_metadata_to_chunks(chunks)
+
         # Prepare data for ChromaDB
         ids = [f"chunk_{i}" for i in range(len(chunks))]
         documents = [chunk['text'] for chunk in chunks]
@@ -169,14 +116,24 @@ class ChromaRetriever:
         # ChromaDB metadata requirements:
         # - Values must be str, int, float, or bool (not None)
         # - Store source, age_range, and chunk_id for retrieval context
-        metadatas = [
-            {
+        # - Store min_age and max_age as integers for range filtering
+        metadatas = []
+        for chunk in chunks:
+            metadata = {
                 'source': chunk.get('source', ''),
-                'age_range': chunk.get('age_range') or '',  # Convert None to empty string
+                'age_range': chunk.get('age_range', ''),  # Keep original string for display
                 'chunk_id': chunk.get('chunk_id', -1),  # -1 indicates unknown/missing
             }
-            for chunk in chunks
-        ]
+
+            # Add numeric age bounds if available (for filtering)
+            min_age = chunk.get('min_age')
+            max_age = chunk.get('max_age')
+            if min_age is not None:
+                metadata['min_age'] = min_age
+            if max_age is not None:
+                metadata['max_age'] = max_age
+
+            metadatas.append(metadata)
 
         # Add to ChromaDB (auto-embeds and persists to disk)
         self.collection.add(
@@ -194,7 +151,10 @@ class ChromaRetriever:
 
     def retrieve(self, query: str, top_k: int = 3) -> Tuple[List[Dict], List[float], float]:
         """
-        Retrieve most relevant chunks for a query.
+        Retrieve most relevant chunks for a query with age-aware filtering.
+
+        If the query contains an age (e.g., "2 month olds"), only documents
+        with matching age ranges are considered.
 
         Args:
             query: User's question
@@ -208,10 +168,26 @@ class ChromaRetriever:
 
         start_time = time.time()
 
+        # Extract age from query for age-aware filtering
+        query_age = extract_age_from_query(query)
+
+        # Build where clause for age filtering
+        where_clause = None
+        if query_age is not None:
+            # Filter to documents where min_age <= query_age <= max_age
+            where_clause = {
+                "$and": [
+                    {"min_age": {"$lte": query_age}},
+                    {"max_age": {"$gte": query_age}}
+                ]
+            }
+            print(f"  [Age Filter] Filtering for age {query_age} months")
+
         # Query ChromaDB (uses cosine similarity)
         results = self.collection.query(
             query_texts=[query],
-            n_results=top_k
+            n_results=top_k,
+            where=where_clause
         )
 
         # Parse results
