@@ -47,14 +47,38 @@ class HybridRetriever:
         if use_safety_filter:
             print("Safety filter: ENABLED")
 
-    def index_documents(self, chunks: List[Dict]):
+    def index_documents(self, chunks: List[Dict], quality_threshold: float = 0.4):
         """
-        Index documents with both BM25 and embeddings.
+        Index documents with both BM25 and embeddings, with index-time filtering.
+
+        Documents are filtered BEFORE indexing to remove:
+        - Documents with disclaimers (unreliable content)
+        - Documents with implausible claims
+        - Documents below quality threshold
 
         Args:
             chunks: List of document chunks with text and metadata
+            quality_threshold: Minimum quality score (0-1) for documents
         """
-        print(f"Indexing {len(chunks)} chunks with hybrid approach...")
+        # PHASE 1: Index-Time Filtering
+        original_count = len(chunks)
+        if self.use_safety_filter and self.content_filter:
+            print(f"\n[Phase 1: Index-Time Filtering]")
+            print(f"Pre-filtering {original_count} chunks before indexing...")
+            chunks, reasons = self.content_filter.filter_before_indexing(
+                chunks,
+                quality_threshold=quality_threshold
+            )
+            removed_count = original_count - len(chunks)
+            print(f"✓ Kept {len(chunks)}/{original_count} chunks ({removed_count} filtered out)")
+
+            if reasons:
+                print(f"\nFiltered documents:")
+                for reason in reasons:
+                    print(f"  ✗ {reason}")
+            print()
+
+        print(f"Indexing {len(chunks)} clean chunks with hybrid approach...")
         start_time = time.time()
 
         self.chunks = chunks
@@ -75,6 +99,10 @@ class HybridRetriever:
 
         elapsed = time.time() - start_time
         print(f"Hybrid indexing complete! Took {elapsed:.2f}s")
+
+        if self.use_safety_filter:
+            removed_count = original_count - len(chunks)
+            print(f"✓ Index contains only high-quality documents (filtered {removed_count} at index-time)")
 
     def retrieve(self, query: str, top_k: int = 3) -> Tuple[List[Dict], List[float], float]:
         """
@@ -118,17 +146,6 @@ class HybridRetriever:
         # Retrieve chunks and scores
         retrieved_chunks = [self.chunks[idx] for idx in top_indices]
         scores = [float(hybrid_scores[idx]) for idx in top_indices]
-
-        # Apply safety filter if enabled
-        if self.use_safety_filter and self.content_filter:
-            original_count = len(retrieved_chunks)
-            retrieved_chunks, scores, reasons = self.content_filter.filter_chunks(
-                retrieved_chunks, scores
-            )
-            if reasons:
-                print(f"  [Safety Filter] Removed {original_count - len(retrieved_chunks)} low-quality documents")
-                for reason in reasons:
-                    print(f"    - {reason}")
 
         retrieval_time = time.time() - start_time
 

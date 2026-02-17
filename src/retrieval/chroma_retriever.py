@@ -5,9 +5,69 @@ Uses ChromaDB for automatic vector storage and retrieval.
 
 import chromadb
 from chromadb.config import Settings
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
 import time
+import re
 from src.safety.content_filter import ContentFilter
+
+
+def parse_age_range(age_range_str: Optional[str]) -> Tuple[Optional[int], Optional[int]]:
+    """
+    Parse age range string into min and max ages.
+
+    Args:
+        age_range_str: Age range like "2-4", "0-2", "12-18", etc.
+
+    Returns:
+        Tuple of (min_age, max_age) or (None, None) if parsing fails
+
+    Examples:
+        "2-4" -> (2, 4)
+        "0-2" -> (0, 2)
+        "12-18" -> (12, 18)
+    """
+    if not age_range_str:
+        return None, None
+
+    # Match patterns like "2-4" or "0-2"
+    match = re.match(r'^(\d+)-(\d+)$', age_range_str.strip())
+    if match:
+        min_age = int(match.group(1))
+        max_age = int(match.group(2))
+        return min_age, max_age
+
+    return None, None
+
+
+def extract_age_from_query(query: str) -> Optional[int]:
+    """
+    Extract age in months from a user query.
+
+    Args:
+        query: User's question
+
+    Returns:
+        Age in months, or None if no age found
+
+    Examples:
+        "what do 2 month olds do" -> 2
+        "6 month old baby" -> 6
+        "what can a 12-month-old do" -> 12
+        "newborn abilities" -> None
+    """
+    query_lower = query.lower()
+
+    # Pattern 1: "N month" or "N-month"
+    match = re.search(r'(\d+)[-\s]month', query_lower)
+    if match:
+        return int(match.group(1))
+
+    # Pattern 2: "N months"
+    match = re.search(r'(\d+)\s+months', query_lower)
+    if match:
+        return int(match.group(1))
+
+    return None
 
 
 class ChromaRetriever:
@@ -53,13 +113,19 @@ class ChromaRetriever:
         if use_safety_filter:
             print("Safety filter: ENABLED")
 
-    def index_documents(self, chunks: List[Dict], force_reindex: bool = False):
+    def index_documents(self, chunks: List[Dict], force_reindex: bool = False, quality_threshold: float = 0.4):
         """
-        Index documents into ChromaDB.
+        Index documents into ChromaDB with index-time filtering.
+
+        Documents are filtered BEFORE indexing to remove:
+        - Documents with disclaimers (unreliable content)
+        - Documents with implausible claims
+        - Documents below quality threshold
 
         Args:
             chunks: List of document chunks with text and metadata
             force_reindex: If True, clear and re-index all documents
+            quality_threshold: Minimum quality score (0-1) for documents
         """
         # Check if already indexed
         if self.collection.count() > 0 and not force_reindex:
@@ -75,7 +141,25 @@ class ChromaRetriever:
                 metadata={"hnsw:space": "cosine"}
             )
 
-        print(f"Indexing {len(chunks)} chunks into ChromaDB...")
+        # PHASE 1: Index-Time Filtering (remove known bad documents)
+        original_count = len(chunks)
+        if self.use_safety_filter and self.content_filter:
+            print(f"\n[Phase 1: Index-Time Filtering]")
+            print(f"Pre-filtering {original_count} chunks before indexing...")
+            chunks, reasons = self.content_filter.filter_before_indexing(
+                chunks,
+                quality_threshold=quality_threshold
+            )
+            removed_count = original_count - len(chunks)
+            print(f"✓ Kept {len(chunks)}/{original_count} chunks ({removed_count} filtered out)")
+
+            if reasons:
+                print(f"\nFiltered documents:")
+                for reason in reasons:
+                    print(f"  ✗ {reason}")
+            print()
+
+        print(f"Indexing {len(chunks)} clean chunks into ChromaDB...")
         start_time = time.time()
 
         # Prepare data for ChromaDB
@@ -104,6 +188,9 @@ class ChromaRetriever:
         elapsed = time.time() - start_time
         print(f"✓ Indexing complete! Took {elapsed:.2f}s")
         print(f"✓ Persisted to disk: {self.collection.count()} chunks saved")
+
+        if self.use_safety_filter:
+            print(f"✓ Index contains only high-quality documents (filtered {removed_count} at index-time)")
 
     def retrieve(self, query: str, top_k: int = 3) -> Tuple[List[Dict], List[float], float]:
         """
@@ -147,17 +234,6 @@ class ChromaRetriever:
                     'chunk_id': metadata.get('chunk_id', -1)  # -1 indicates unknown
                 })
                 scores.append(similarity)
-
-        # Apply safety filter if enabled
-        if self.use_safety_filter and self.content_filter:
-            original_count = len(retrieved_chunks)
-            retrieved_chunks, scores, reasons = self.content_filter.filter_chunks(
-                retrieved_chunks, scores
-            )
-            if reasons:
-                print(f"  [Safety Filter] Removed {original_count - len(retrieved_chunks)} low-quality documents")
-                for reason in reasons:
-                    print(f"    - {reason}")
 
         retrieval_time = time.time() - start_time
 

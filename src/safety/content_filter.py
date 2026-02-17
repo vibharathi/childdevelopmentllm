@@ -74,7 +74,7 @@ class ContentFilter:
                      chunks: List[Dict],
                      scores: List[float]) -> Tuple[List[Dict], List[float], List[str]]:
         """
-        Filter retrieved chunks based on content quality.
+        Filter retrieved chunks based on content quality (query-time filtering).
 
         Args:
             chunks: List of retrieved document chunks
@@ -108,6 +108,55 @@ class ContentFilter:
             filtered_scores.append(score)
 
         return filtered_chunks, filtered_scores, reasons_removed
+
+    def filter_before_indexing(self,
+                               chunks: List[Dict],
+                               quality_threshold: float = 0.4) -> Tuple[List[Dict], List[str]]:
+        """
+        Filter documents before indexing (index-time filtering).
+
+        This removes documents with known quality issues that should NEVER
+        be stored in the vector database:
+        - Documents with disclaimers indicating unreliable content
+        - Documents with medically implausible claims
+        - Documents below quality threshold
+
+        Args:
+            chunks: List of document chunks to filter
+            quality_threshold: Minimum quality score (0-1) to keep documents
+
+        Returns:
+            Tuple of (filtered_chunks, reasons_removed)
+        """
+        filtered_chunks = []
+        reasons_removed = []
+
+        for chunk in chunks:
+            text = chunk['text'].lower()
+            source = chunk.get('source', 'unknown')
+
+            # Check for disclaimers
+            if self.filter_disclaimers and self._has_disclaimer(text):
+                reasons_removed.append(f"{source}: Contains disclaimer indicating unreliable content")
+                continue
+
+            # Check for implausible claims
+            if self.filter_implausible:
+                implausible, reason = self._has_implausible_claim(text)
+                if implausible:
+                    reasons_removed.append(f"{source}: {reason}")
+                    continue
+
+            # Check quality score
+            quality_score = self.assess_quality(chunk)
+            if quality_score < quality_threshold:
+                reasons_removed.append(f"{source}: Low quality score ({quality_score:.2f} < {quality_threshold})")
+                continue
+
+            # Passed all filters
+            filtered_chunks.append(chunk)
+
+        return filtered_chunks, reasons_removed
 
     def _has_disclaimer(self, text: str) -> bool:
         """
