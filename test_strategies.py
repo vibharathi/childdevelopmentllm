@@ -168,7 +168,7 @@ def test_full_qa_pipeline(model_path, questions):
 
             # Generate answer
             context = "\n\n".join([chunk['text'] for chunk in retrieved_chunks])
-            answer = llm.generate_answer(question, context, max_tokens=200)
+            answer = llm.generate_answer(question, context, max_tokens=75)
 
             print(f"Answer: {answer}")
             print(f"Top score: {scores[0]:.3f} | Retrieval: {retrieval_time*1000:.2f}ms")
