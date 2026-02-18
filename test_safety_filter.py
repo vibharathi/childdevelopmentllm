@@ -49,9 +49,9 @@ def test_safety_filter_on_noisy_docs():
         print("-" * 80)
         print(f"Content preview: {chunk['text'][:150]}...")
 
-        # Test if filter catches it
-        filtered_chunks, filtered_scores, reasons = content_filter.filter_chunks(
-            [chunk], [1.0]
+        # Test if filter catches it (using production index-time filtering)
+        filtered_chunks, reasons = content_filter.filter_before_indexing(
+            [chunk], quality_threshold=0.4
         )
 
         if len(filtered_chunks) == 0:
@@ -85,8 +85,8 @@ def test_safety_filter_on_noisy_docs():
     false_positives = 0
 
     for chunk in test_good_chunks:
-        filtered_chunks, filtered_scores, reasons = content_filter.filter_chunks(
-            [chunk], [1.0]
+        filtered_chunks, reasons = content_filter.filter_before_indexing(
+            [chunk], quality_threshold=0.4
         )
 
         if len(filtered_chunks) == 0:

@@ -74,8 +74,8 @@ class ContentFilter:
         """
         Validate chunk content against safety criteria.
 
-        Consolidates shared validation logic between filter_chunks()
-        and filter_before_indexing().
+        Consolidates shared validation logic for checking disclaimers
+        and implausible claims (used by filter_before_indexing).
 
         Args:
             chunk: Document chunk to validate
@@ -99,37 +99,6 @@ class ContentFilter:
                 return False, f"{source}: {reason}"
 
         return True, None
-
-    def filter_chunks(self,
-                     chunks: List[Dict],
-                     scores: List[float]) -> Tuple[List[Dict], List[float], List[str]]:
-        """
-        Filter retrieved chunks based on content quality (query-time filtering).
-
-        Args:
-            chunks: List of retrieved document chunks
-            scores: Corresponding similarity scores
-
-        Returns:
-            Tuple of (filtered_chunks, filtered_scores, reasons_removed)
-        """
-        filtered_chunks = []
-        filtered_scores = []
-        reasons_removed = []
-
-        for chunk, score in zip(chunks, scores):
-            # Run standard content validation
-            is_valid, reason = self._validate_content(chunk)
-
-            if not is_valid:
-                reasons_removed.append(reason)
-                continue
-
-            # Passed all filters
-            filtered_chunks.append(chunk)
-            filtered_scores.append(score)
-
-        return filtered_chunks, filtered_scores, reasons_removed
 
     def filter_before_indexing(self,
                                chunks: List[Dict],
@@ -287,19 +256,19 @@ def test_content_filter():
         }
     ]
 
-    scores = [0.8, 0.7, 0.75]
-
     filter = ContentFilter()
 
     print("\nOriginal chunks:")
-    for chunk, score in zip(test_chunks, scores):
-        print(f"  - {chunk['source']}: {score:.2f}")
+    for chunk in test_chunks:
+        quality = filter.assess_quality(chunk)
+        print(f"  - {chunk['source']}: quality={quality:.2f}")
 
-    filtered_chunks, filtered_scores, reasons = filter.filter_chunks(test_chunks, scores)
+    filtered_chunks, reasons = filter.filter_before_indexing(test_chunks, quality_threshold=0.4)
 
     print(f"\nFiltered chunks:")
-    for chunk, score in zip(filtered_chunks, filtered_scores):
-        print(f"  - {chunk['source']}: {score:.2f}")
+    for chunk in filtered_chunks:
+        quality = filter.assess_quality(chunk)
+        print(f"  - {chunk['source']}: quality={quality:.2f}")
 
     print(f"\nRemoved:")
     for reason in reasons:
