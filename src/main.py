@@ -117,7 +117,9 @@ class ChildDevelopmentQA:
         # Retrieve relevant chunks using selected strategy
         retrieved_chunks, scores, retrieval_time = self.retriever.retrieve(question, top_k=3)
 
-        if not retrieved_chunks or scores[0] < 0.3:  # Low confidence threshold
+        # Strategy-specific thresholds (hybrid scores tend to be lower)
+        threshold = 0.25 if self.strategy == "hybrid" else 0.3
+        if not retrieved_chunks or scores[0] < threshold:
             total_time = time.time() - total_start_time
             return {
                 'answer': "I don't have specific information about that in my knowledge base. "
