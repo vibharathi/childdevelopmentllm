@@ -5,7 +5,7 @@ Generates detailed comparison data for README documentation.
 
 import sys
 from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.utils.data_loader import load_milestone_data
 from src.utils.confidence import calculate_confidence

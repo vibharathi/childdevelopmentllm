@@ -4,7 +4,7 @@ Full system test - Generate example outputs for README documentation.
 
 import sys
 from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.main import ChildDevelopmentQA
 import json

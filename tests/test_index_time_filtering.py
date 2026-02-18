@@ -5,6 +5,10 @@ This test demonstrates Phase 1 filtering - removing noisy documents
 BEFORE they are stored in the vector database.
 """
 
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from src.utils.data_loader import load_milestone_data
 from src.retrieval.chroma_retriever import ChromaRetriever
 from src.retrieval.embedding_retriever import EmbeddingRetriever

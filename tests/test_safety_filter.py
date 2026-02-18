@@ -4,7 +4,7 @@ Test script to verify safety filter is catching all noisy documents.
 
 import sys
 from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.utils.data_loader import load_milestone_data
 from src.safety.content_filter import ContentFilter
