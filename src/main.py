@@ -45,7 +45,10 @@ class ChildDevelopmentQA:
                 persist_dir="./data/chroma_db"
             )
         elif strategy == "hybrid":
-            self.retriever = HybridRetriever()
+            self.retriever = HybridRetriever(
+                bm25_weight=0.2,
+                embedding_weight=0.8
+            )
         else:
             raise ValueError(f"Unknown strategy: {strategy}. Use 'embedding' or 'hybrid'")
 

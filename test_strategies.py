@@ -269,7 +269,10 @@ def main():
     )
 
     # Test hybrid strategy
-    hybrid_retriever = HybridRetriever()
+    hybrid_retriever = HybridRetriever(
+        bm25_weight=0.2,
+        embedding_weight=0.8
+    )
     hybrid_results = test_retrieval_strategy(
         hybrid_retriever,
         "Hybrid Retrieval (BM25 + Embeddings)",
