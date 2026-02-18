@@ -10,7 +10,7 @@ import os
 class LocalLLM:
     """Wrapper for local LLM using llama-cpp-python."""
 
-    def __init__(self, model_path: str = "data/models/llama-3.2-3b.gguf", n_ctx: int = 2048, n_threads: int = 4):
+    def __init__(self, model_path: str = "data/models/llama-3.2-3b.gguf", n_ctx: int = 2048, n_threads: int = 4, n_gpu_layers: int = -1):
         """
         Initialize the local LLM.
 
@@ -18,15 +18,21 @@ class LocalLLM:
             model_path: Path to the GGUF model file
             n_ctx: Context window size
             n_threads: Number of threads for inference
+            n_gpu_layers: Number of layers to offload to GPU (-1 = all layers)
+                         Set to 0 to disable GPU acceleration
         """
         if not os.path.exists(model_path):
             raise FileNotFoundError(f"Model not found at {model_path}")
 
         print(f"Loading model from {model_path}...")
+        if n_gpu_layers != 0:
+            print(f"GPU acceleration: ENABLED (offloading {n_gpu_layers if n_gpu_layers > 0 else 'all'} layers to Metal)")
+
         self.llm = Llama(
             model_path=model_path,
             n_ctx=n_ctx,
             n_threads=n_threads,
+            n_gpu_layers=n_gpu_layers,  # Enable GPU acceleration!
             verbose=False
         )
         print("Model loaded successfully!")
@@ -35,7 +41,7 @@ class LocalLLM:
         self,
         prompt: str,
         max_tokens: int = 256,
-        temperature: float = 0.7,
+        temperature: float = 0.3,
         stop: Optional[List[str]] = None
     ) -> str:
         """
@@ -64,7 +70,7 @@ class LocalLLM:
         self,
         messages: List[Dict[str, str]],
         max_tokens: int = 256,
-        temperature: float = 0.7
+        temperature: float = 0.3
     ) -> str:
         """
         Chat-style completion with message history.

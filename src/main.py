@@ -108,16 +108,22 @@ class ChildDevelopmentQA:
         Returns:
             Dictionary with answer and metadata
         """
+        import time
+        total_start_time = time.time()
+
         # Retrieve relevant chunks using selected strategy
         retrieved_chunks, scores, retrieval_time = self.retriever.retrieve(question, top_k=3)
 
         if not retrieved_chunks or scores[0] < 0.3:  # Low confidence threshold
+            total_time = time.time() - total_start_time
             return {
                 'answer': "I don't have specific information about that in my knowledge base. "
                          "Please try asking about developmental milestones for children aged 0-36 months.",
                 'sources': [],
                 'confidence': 'low',
                 'retrieval_time': retrieval_time,
+                'generation_time': 0,
+                'total_time': total_time,
                 'strategy': self.strategy
             }
 
@@ -125,7 +131,10 @@ class ChildDevelopmentQA:
         context = "\n\n".join([chunk['text'] for chunk in retrieved_chunks])
 
         # Generate answer using LLM
-        answer = self.llm.generate_answer(question, context, max_tokens=300)
+        # Reduced max_tokens for faster generation (75 tokens ≈ 8-9 minutes on CPU)
+        generation_start_time = time.time()
+        answer = self.llm.generate_answer(question, context, max_tokens=75)
+        generation_time = time.time() - generation_start_time
 
         # Extract sources
         sources = [
@@ -146,11 +155,15 @@ class ChildDevelopmentQA:
         else:
             confidence = 'low'
 
+        total_time = time.time() - total_start_time
+
         return {
             'answer': answer,
             'sources': sources,
             'confidence': confidence,
             'retrieval_time': retrieval_time,
+            'generation_time': generation_time,
+            'total_time': total_time,
             'strategy': self.strategy
         }
 
@@ -190,7 +203,8 @@ class ChildDevelopmentQA:
                     print(f"  • {source['filename']}{age_str}{score_str}")
 
                 print("\n" + "-"*60)
-                print(f"Strategy: {result['strategy']} | Confidence: {result['confidence']} | Retrieval: {result['retrieval_time']*1000:.2f}ms")
+                print(f"Strategy: {result['strategy']} | Confidence: {result['confidence']}")
+                print(f"Retrieval: {result['retrieval_time']*1000:.2f}ms | Generation: {result.get('generation_time', 0):.1f}s | Total: {result.get('total_time', 0):.1f}s")
                 print("-"*60)
 
             except KeyboardInterrupt:
@@ -218,7 +232,8 @@ class ChildDevelopmentQA:
             print(f"  • {source['filename']}{age_str}{score_str}")
 
         print("\n" + "="*60)
-        print(f"Strategy: {result['strategy']} | Confidence: {result['confidence']} | Retrieval: {result['retrieval_time']*1000:.2f}ms")
+        print(f"Strategy: {result['strategy']} | Confidence: {result['confidence']}")
+        print(f"Retrieval: {result['retrieval_time']*1000:.2f}ms | Generation: {result.get('generation_time', 0):.1f}s | Total: {result.get('total_time', 0):.1f}s")
         print("="*60)
 
 
