@@ -14,17 +14,18 @@ from src.generation.llm import LocalLLM
 from src.retrieval.embedding_retriever import EmbeddingRetriever
 from src.retrieval.hybrid_retriever import HybridRetriever
 from src.retrieval.chroma_retriever import ChromaRetriever
+from src.config import LLMConfig, RetrievalConfig, UIConfig
 
 
 class ChildDevelopmentQA:
     """Main Q&A system for child development questions."""
 
-    def __init__(self, model_path: str = "data/models/llama-3.2-3b.gguf", strategy: str = "embedding"):
+    def __init__(self, model_path: str = LLMConfig.DEFAULT_MODEL_PATH, strategy: str = "embedding"):
         """
         Initialize the Q&A system.
 
         Args:
-            model_path: Path to the LLM model
+            model_path: Path to the LLM model (defaults to config value)
             strategy: Retrieval strategy ('embedding' or 'hybrid')
         """
         print("="*60)
@@ -41,13 +42,13 @@ class ChildDevelopmentQA:
         if strategy == "embedding":
             # Use ChromaDB for persistent embedding storage
             self.retriever = ChromaRetriever(
-                collection_name="child_development",
-                persist_dir="./data/chroma_db"
+                collection_name=RetrievalConfig.CHROMA_COLLECTION_NAME,
+                persist_dir=RetrievalConfig.CHROMA_PERSIST_DIR
             )
         elif strategy == "hybrid":
             self.retriever = HybridRetriever(
-                bm25_weight=0.2,
-                embedding_weight=0.8
+                bm25_weight=RetrievalConfig.HYBRID_BM25_WEIGHT,
+                embedding_weight=RetrievalConfig.HYBRID_EMBEDDING_WEIGHT
             )
         else:
             raise ValueError(f"Unknown strategy: {strategy}. Use 'embedding' or 'hybrid'")
@@ -115,15 +116,22 @@ class ChildDevelopmentQA:
         total_start_time = time.time()
 
         # Retrieve relevant chunks using selected strategy
-        retrieved_chunks, scores, retrieval_time = self.retriever.retrieve(question, top_k=3)
+        retrieved_chunks, scores, retrieval_time = self.retriever.retrieve(
+            question,
+            top_k=RetrievalConfig.DEFAULT_TOP_K
+        )
 
         # Strategy-specific thresholds (hybrid scores tend to be lower)
-        threshold = 0.25 if self.strategy == "hybrid" else 0.3
+        threshold = (
+            RetrievalConfig.LOW_CONFIDENCE_THRESHOLD_HYBRID
+            if self.strategy == "hybrid"
+            else RetrievalConfig.LOW_CONFIDENCE_THRESHOLD
+        )
+
         if not retrieved_chunks or scores[0] < threshold:
             total_time = time.time() - total_start_time
             return {
-                'answer': "I don't have specific information about that in my knowledge base. "
-                         "Please try asking about developmental milestones for children aged 0-36 months.",
+                'answer': UIConfig.LOW_CONFIDENCE_MESSAGE,
                 'sources': [],
                 'confidence': 'low',
                 'retrieval_time': retrieval_time,
@@ -136,9 +144,12 @@ class ChildDevelopmentQA:
         context = "\n\n".join([chunk['text'] for chunk in retrieved_chunks])
 
         # Generate answer using LLM
-        # Reduced max_tokens for faster generation (75 tokens ≈ 8-9 minutes on CPU)
         generation_start_time = time.time()
-        answer = self.llm.generate_answer(question, context, max_tokens=75)
+        answer = self.llm.generate_answer(
+            question,
+            context,
+            max_tokens=LLMConfig.MAX_TOKENS
+        )
         generation_time = time.time() - generation_start_time
 
         # Extract sources
@@ -153,9 +164,9 @@ class ChildDevelopmentQA:
 
         # Calculate confidence based on retrieval scores
         avg_score = sum(scores) / len(scores)
-        if avg_score > 0.6:
+        if avg_score > RetrievalConfig.HIGH_CONFIDENCE_THRESHOLD:
             confidence = 'high'
-        elif avg_score > 0.4:
+        elif avg_score > RetrievalConfig.MEDIUM_CONFIDENCE_THRESHOLD:
             confidence = 'medium'
         else:
             confidence = 'low'
@@ -250,7 +261,7 @@ def main():
     parser.add_argument(
         '--model',
         type=str,
-        default='data/models/llama-3.2-3b.gguf',
+        default=LLMConfig.DEFAULT_MODEL_PATH,
         help='Path to LLM model file'
     )
     parser.add_argument(

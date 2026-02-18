@@ -5,19 +5,26 @@ Local LLM wrapper using llama-cpp-python.
 from llama_cpp import Llama
 from typing import List, Dict, Optional
 import os
+from src.config import LLMConfig
 
 
 class LocalLLM:
     """Wrapper for local LLM using llama-cpp-python."""
 
-    def __init__(self, model_path: str = "data/models/llama-3.2-3b.gguf", n_ctx: int = 2048, n_threads: int = 4, n_gpu_layers: int = -1):
+    def __init__(
+        self,
+        model_path: str = LLMConfig.DEFAULT_MODEL_PATH,
+        n_ctx: int = LLMConfig.CONTEXT_WINDOW,
+        n_threads: int = LLMConfig.NUM_THREADS,
+        n_gpu_layers: int = -1
+    ):
         """
         Initialize the local LLM.
 
         Args:
-            model_path: Path to the GGUF model file
-            n_ctx: Context window size
-            n_threads: Number of threads for inference
+            model_path: Path to the GGUF model file (defaults to config)
+            n_ctx: Context window size (defaults to config)
+            n_threads: Number of threads for inference (defaults to config)
             n_gpu_layers: Number of layers to offload to GPU (-1 = all layers)
                          Set to 0 to disable GPU acceleration
         """
@@ -100,7 +107,7 @@ class LocalLLM:
         self,
         question: str,
         context: str,
-        max_tokens: int = 256
+        max_tokens: int = LLMConfig.MAX_TOKENS
     ) -> str:
         """
         Generate an answer based on question and retrieved context.
@@ -109,7 +116,7 @@ class LocalLLM:
         Args:
             question: User's question
             context: Retrieved context from milestone documents
-            max_tokens: Maximum tokens to generate
+            max_tokens: Maximum tokens to generate (defaults to config)
 
         Returns:
             Generated answer
@@ -123,7 +130,7 @@ Question: {question}
 
 Answer:"""
 
-        response = self.generate(prompt, max_tokens=max_tokens, temperature=0.3)
+        response = self.generate(prompt, max_tokens=max_tokens, temperature=LLMConfig.TEMPERATURE)
         return response
 
 

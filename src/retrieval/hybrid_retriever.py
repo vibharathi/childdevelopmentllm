@@ -14,6 +14,7 @@ from src.retrieval.age_utils import (
     extract_age_from_query,
     get_age_matched_indices
 )
+from src.config import RetrievalConfig, SafetyConfig
 
 
 class HybridRetriever:
@@ -24,19 +25,21 @@ class HybridRetriever:
     for more robust retrieval.
     """
 
-    def __init__(self,
-                 model_name: str = "all-MiniLM-L6-v2",
-                 bm25_weight: float = 0.5,
-                 embedding_weight: float = 0.5,
-                 use_safety_filter: bool = True):
+    def __init__(
+        self,
+        model_name: str = RetrievalConfig.EMBEDDING_MODEL,
+        bm25_weight: float = RetrievalConfig.HYBRID_BM25_WEIGHT,
+        embedding_weight: float = RetrievalConfig.HYBRID_EMBEDDING_WEIGHT,
+        use_safety_filter: bool = SafetyConfig.ENABLE_SAFETY_FILTER
+    ):
         """
         Initialize the hybrid retriever.
 
         Args:
-            model_name: Sentence-transformer model name
-            bm25_weight: Weight for BM25 scores (0-1)
-            embedding_weight: Weight for embedding scores (0-1)
-            use_safety_filter: Whether to apply content filtering
+            model_name: Sentence-transformer model name (defaults to config)
+            bm25_weight: Weight for BM25 scores 0-1 (defaults to config)
+            embedding_weight: Weight for embedding scores 0-1 (defaults to config)
+            use_safety_filter: Whether to apply content filtering (defaults to config)
         """
         print(f"Loading embedding model: {model_name}...")
         self.model = SentenceTransformer(model_name)
@@ -52,7 +55,7 @@ class HybridRetriever:
         if use_safety_filter:
             print("Safety filter: ENABLED")
 
-    def index_documents(self, chunks: List[Dict], quality_threshold: float = 0.4):
+    def index_documents(self, chunks: List[Dict], quality_threshold: float = SafetyConfig.QUALITY_THRESHOLD):
         """
         Index documents with both BM25 and embeddings, with index-time filtering.
 
@@ -63,7 +66,7 @@ class HybridRetriever:
 
         Args:
             chunks: List of document chunks with text and metadata
-            quality_threshold: Minimum quality score (0-1) for documents
+            quality_threshold: Minimum quality score 0-1 (defaults to config)
         """
         # PHASE 1: Index-Time Filtering
         original_count = len(chunks)
@@ -112,7 +115,7 @@ class HybridRetriever:
             removed_count = original_count - len(chunks)
             print(f"✓ Index contains only high-quality documents (filtered {removed_count} at index-time)")
 
-    def retrieve(self, query: str, top_k: int = 3) -> Tuple[List[Dict], List[float], float]:
+    def retrieve(self, query: str, top_k: int = RetrievalConfig.DEFAULT_TOP_K) -> Tuple[List[Dict], List[float], float]:
         """
         Retrieve most relevant chunks using hybrid scoring with age-aware filtering.
 
@@ -121,7 +124,7 @@ class HybridRetriever:
 
         Args:
             query: User's question
-            top_k: Number of chunks to retrieve
+            top_k: Number of chunks to retrieve (defaults to config)
 
         Returns:
             Tuple of (retrieved_chunks, hybrid_scores, retrieval_time)

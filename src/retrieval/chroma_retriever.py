@@ -12,6 +12,7 @@ from src.retrieval.age_utils import (
     add_age_metadata_to_chunks,
     extract_age_from_query
 )
+from src.config import RetrievalConfig, SafetyConfig
 
 
 class ChromaRetriever:
@@ -24,18 +25,19 @@ class ChromaRetriever:
 
     def __init__(
         self,
-        collection_name: str = "child_development",
-        persist_dir: str = "./data/chroma_db",
-        use_safety_filter: bool = True
+        collection_name: str = RetrievalConfig.CHROMA_COLLECTION_NAME,
+        persist_dir: str = RetrievalConfig.CHROMA_PERSIST_DIR,
+        use_safety_filter: bool = SafetyConfig.ENABLE_SAFETY_FILTER
     ):
         """
         Initialize ChromaDB retriever.
 
         Args:
-            collection_name: Name of the collection
-            persist_dir: Local directory for persistent storage
-            use_safety_filter: Whether to apply content filtering
+            collection_name: Name of the collection (defaults to config)
+            persist_dir: Local directory for persistent storage (defaults to config)
+            use_safety_filter: Whether to apply content filtering (defaults to config)
         """
+
         print(f"Initializing ChromaDB (local storage: {persist_dir})...")
 
         # Create client with local persistence
@@ -44,7 +46,7 @@ class ChromaRetriever:
         # Get or create collection
         self.collection = self.client.get_or_create_collection(
             name=collection_name,
-            metadata={"hnsw:space": "cosine"}  # Use cosine similarity
+            metadata={"hnsw:space": RetrievalConfig.CHROMA_DISTANCE_METRIC}
         )
 
         self.collection_name = collection_name
@@ -57,7 +59,7 @@ class ChromaRetriever:
         if use_safety_filter:
             print("Safety filter: ENABLED")
 
-    def index_documents(self, chunks: List[Dict], force_reindex: bool = False, quality_threshold: float = 0.4):
+    def index_documents(self, chunks: List[Dict], force_reindex: bool = False, quality_threshold: float = SafetyConfig.QUALITY_THRESHOLD):
         """
         Index documents into ChromaDB with index-time filtering.
 
@@ -69,8 +71,9 @@ class ChromaRetriever:
         Args:
             chunks: List of document chunks with text and metadata
             force_reindex: If True, clear and re-index all documents
-            quality_threshold: Minimum quality score (0-1) for documents
+            quality_threshold: Minimum quality score 0-1 (defaults to config)
         """
+
         # Check if already indexed
         if self.collection.count() > 0 and not force_reindex:
             print(f"✓ Collection already indexed with {self.collection.count()} chunks")
@@ -149,7 +152,7 @@ class ChromaRetriever:
         if self.use_safety_filter:
             print(f"✓ Index contains only high-quality documents (filtered {removed_count} at index-time)")
 
-    def retrieve(self, query: str, top_k: int = 3) -> Tuple[List[Dict], List[float], float]:
+    def retrieve(self, query: str, top_k: int = RetrievalConfig.DEFAULT_TOP_K) -> Tuple[List[Dict], List[float], float]:
         """
         Retrieve most relevant chunks for a query with age-aware filtering.
 
@@ -158,11 +161,12 @@ class ChromaRetriever:
 
         Args:
             query: User's question
-            top_k: Number of chunks to retrieve
+            top_k: Number of chunks to retrieve (defaults to config)
 
         Returns:
             Tuple of (retrieved_chunks, similarity_scores, retrieval_time)
         """
+
         if self.collection.count() == 0:
             raise ValueError("No documents indexed. Call index_documents() first.")
 
