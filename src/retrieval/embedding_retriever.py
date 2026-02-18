@@ -7,10 +7,11 @@ from sentence_transformers import SentenceTransformer
 import numpy as np
 from typing import List, Dict, Tuple
 import time
-from src.safety.content_filter import ContentFilter
+from src.retrieval.base_retriever import BaseRetriever
+from src.config import SafetyConfig
 
 
-class EmbeddingRetriever:
+class EmbeddingRetriever(BaseRetriever):
     """
     Dense embedding-based retrieval using sentence-transformers.
 
@@ -18,25 +19,24 @@ class EmbeddingRetriever:
     then retrieves based on cosine similarity.
     """
 
-    def __init__(self, model_name: str = "all-MiniLM-L6-v2", use_safety_filter: bool = True):
+    def __init__(self, model_name: str = "all-MiniLM-L6-v2", use_safety_filter: bool = SafetyConfig.ENABLE_SAFETY_FILTER):
         """
         Initialize the embedding retriever.
 
         Args:
             model_name: Sentence-transformer model name
-            use_safety_filter: Whether to apply content filtering
+            use_safety_filter: Whether to apply content filtering (defaults to config)
         """
+        # Initialize base retriever (handles safety filter setup)
+        super().__init__(use_safety_filter=use_safety_filter)
+
         print(f"Loading embedding model: {model_name}...")
         self.model = SentenceTransformer(model_name)
         self.chunks = []
         self.embeddings = None
-        self.use_safety_filter = use_safety_filter
-        self.content_filter = ContentFilter() if use_safety_filter else None
         print(f"Model loaded! Embedding dimension: {self.model.get_sentence_embedding_dimension()}")
-        if use_safety_filter:
-            print("Safety filter: ENABLED")
 
-    def index_documents(self, chunks: List[Dict], quality_threshold: float = 0.4):
+    def index_documents(self, chunks: List[Dict], quality_threshold: float = SafetyConfig.QUALITY_THRESHOLD):
         """
         Create embeddings for document chunks with index-time filtering.
 
@@ -47,25 +47,10 @@ class EmbeddingRetriever:
 
         Args:
             chunks: List of document chunks with text and metadata
-            quality_threshold: Minimum quality score (0-1) for documents
+            quality_threshold: Minimum quality score (0-1) for documents (defaults to config)
         """
-        # PHASE 1: Index-Time Filtering
-        original_count = len(chunks)
-        if self.use_safety_filter and self.content_filter:
-            print(f"\n[Phase 1: Index-Time Filtering]")
-            print(f"Pre-filtering {original_count} chunks before indexing...")
-            chunks, reasons = self.content_filter.filter_before_indexing(
-                chunks,
-                quality_threshold=quality_threshold
-            )
-            removed_count = original_count - len(chunks)
-            print(f"✓ Kept {len(chunks)}/{original_count} chunks ({removed_count} filtered out)")
-
-            if reasons:
-                print(f"\nFiltered documents:")
-                for reason in reasons:
-                    print(f"  ✗ {reason}")
-            print()
+        # Apply index-time filtering (from base class)
+        chunks, removed_count = self.apply_index_time_filtering(chunks, quality_threshold)
 
         print(f"Creating embeddings for {len(chunks)} clean chunks...")
         start_time = time.time()
@@ -83,8 +68,7 @@ class EmbeddingRetriever:
         elapsed = time.time() - start_time
         print(f"Indexing complete! Took {elapsed:.2f}s")
 
-        if self.use_safety_filter:
-            removed_count = original_count - len(chunks)
+        if self.use_safety_filter and removed_count > 0:
             print(f"✓ Index contains only high-quality documents (filtered {removed_count} at index-time)")
 
     def retrieve(self, query: str, top_k: int = 3) -> Tuple[List[Dict], List[float], float]:
@@ -106,8 +90,8 @@ class EmbeddingRetriever:
         # Encode query
         query_embedding = self.model.encode(query, convert_to_numpy=True)
 
-        # Calculate cosine similarity
-        similarities = self._cosine_similarity(query_embedding, self.embeddings)
+        # Calculate cosine similarity (from base class)
+        similarities = self.cosine_similarity(query_embedding, self.embeddings)
 
         # Get top-k indices
         top_indices = np.argsort(similarities)[::-1][:top_k]
@@ -119,26 +103,6 @@ class EmbeddingRetriever:
         retrieval_time = time.time() - start_time
 
         return retrieved_chunks, scores, retrieval_time
-
-    def _cosine_similarity(self, query_vec: np.ndarray, doc_vecs: np.ndarray) -> np.ndarray:
-        """
-        Calculate cosine similarity between query and documents.
-
-        Args:
-            query_vec: Query embedding vector
-            doc_vecs: Document embedding matrix
-
-        Returns:
-            Array of similarity scores
-        """
-        # Normalize vectors
-        query_norm = query_vec / np.linalg.norm(query_vec)
-        doc_norms = doc_vecs / np.linalg.norm(doc_vecs, axis=1, keepdims=True)
-
-        # Calculate cosine similarity
-        similarities = np.dot(doc_norms, query_norm)
-
-        return similarities
 
     def get_stats(self) -> Dict:
         """Get statistics about the indexed documents."""

@@ -8,6 +8,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from src.utils.data_loader import load_milestone_data
+from src.utils.confidence import calculate_confidence
 from src.retrieval.embedding_retriever import EmbeddingRetriever
 from src.retrieval.hybrid_retriever import HybridRetriever
 from src.generation.llm import LocalLLM
@@ -88,13 +89,14 @@ def test_retrieval_strategy(retriever, strategy_name, chunks, questions):
             print(f"      Text: {chunk['text'][:80]}...")
             print()
 
-        # Store results
+        # Store results (using confidence utility)
         results.append({
             "question": question,
             "category": test_case["category"],
             "expected_age": test_case["expected_age"],
-            "top_score": scores[0],
-            "avg_score": sum(scores) / len(scores),
+            "top_score": scores[0] if scores else 0,
+            "avg_score": sum(scores) / len(scores) if scores else 0,
+            "confidence": calculate_confidence(scores),
             "retrieval_time_ms": retrieval_time * 1000,
             "retrieved_chunks": [
                 {

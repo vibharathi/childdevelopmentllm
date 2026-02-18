@@ -8,7 +8,7 @@ This module detects and filters out:
 """
 
 import re
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
 
 
 class ContentFilter:
@@ -70,6 +70,36 @@ class ContentFilter:
         self.filter_implausible = filter_implausible
         self.strict_mode = strict_mode
 
+    def _validate_content(self, chunk: Dict) -> Tuple[bool, Optional[str]]:
+        """
+        Validate chunk content against safety criteria.
+
+        Consolidates shared validation logic between filter_chunks()
+        and filter_before_indexing().
+
+        Args:
+            chunk: Document chunk to validate
+
+        Returns:
+            Tuple of (is_valid, rejection_reason)
+            - is_valid: True if chunk passes all checks
+            - rejection_reason: String reason if rejected, None if valid
+        """
+        text = chunk['text'].lower()
+        source = chunk.get('source', 'unknown')
+
+        # Check for disclaimers
+        if self.filter_disclaimers and self._has_disclaimer(text):
+            return False, f"{source}: Contains disclaimer indicating unreliable content"
+
+        # Check for implausible claims
+        if self.filter_implausible:
+            implausible, reason = self._has_implausible_claim(text)
+            if implausible:
+                return False, f"{source}: {reason}"
+
+        return True, None
+
     def filter_chunks(self,
                      chunks: List[Dict],
                      scores: List[float]) -> Tuple[List[Dict], List[float], List[str]]:
@@ -88,20 +118,12 @@ class ContentFilter:
         reasons_removed = []
 
         for chunk, score in zip(chunks, scores):
-            text = chunk['text'].lower()
-            source = chunk.get('source', 'unknown')
+            # Run standard content validation
+            is_valid, reason = self._validate_content(chunk)
 
-            # Check for disclaimers
-            if self.filter_disclaimers and self._has_disclaimer(text):
-                reasons_removed.append(f"{source}: Contains disclaimer indicating unreliable content")
+            if not is_valid:
+                reasons_removed.append(reason)
                 continue
-
-            # Check for implausible claims
-            if self.filter_implausible:
-                implausible, reason = self._has_implausible_claim(text)
-                if implausible:
-                    reasons_removed.append(f"{source}: {reason}")
-                    continue
 
             # Passed all filters
             filtered_chunks.append(chunk)
@@ -132,24 +154,17 @@ class ContentFilter:
         reasons_removed = []
 
         for chunk in chunks:
-            text = chunk['text'].lower()
-            source = chunk.get('source', 'unknown')
+            # Run standard content validation
+            is_valid, reason = self._validate_content(chunk)
 
-            # Check for disclaimers
-            if self.filter_disclaimers and self._has_disclaimer(text):
-                reasons_removed.append(f"{source}: Contains disclaimer indicating unreliable content")
+            if not is_valid:
+                reasons_removed.append(reason)
                 continue
 
-            # Check for implausible claims
-            if self.filter_implausible:
-                implausible, reason = self._has_implausible_claim(text)
-                if implausible:
-                    reasons_removed.append(f"{source}: {reason}")
-                    continue
-
-            # Check quality score
+            # Additional check: quality score (index-time only)
             quality_score = self.assess_quality(chunk)
             if quality_score < quality_threshold:
+                source = chunk.get('source', 'unknown')
                 reasons_removed.append(f"{source}: Low quality score ({quality_score:.2f} < {quality_threshold})")
                 continue
 

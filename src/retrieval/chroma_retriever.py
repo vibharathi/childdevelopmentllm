@@ -7,7 +7,7 @@ import chromadb
 from chromadb.config import Settings
 from typing import List, Dict, Tuple, Optional
 import time
-from src.safety.content_filter import ContentFilter
+from src.retrieval.base_retriever import BaseRetriever
 from src.retrieval.age_utils import (
     add_age_metadata_to_chunks,
     extract_age_from_query
@@ -15,7 +15,7 @@ from src.retrieval.age_utils import (
 from src.config import RetrievalConfig, SafetyConfig
 
 
-class ChromaRetriever:
+class ChromaRetriever(BaseRetriever):
     """
     Dense embedding retrieval using ChromaDB with local persistence.
 
@@ -37,6 +37,8 @@ class ChromaRetriever:
             persist_dir: Local directory for persistent storage (defaults to config)
             use_safety_filter: Whether to apply content filtering (defaults to config)
         """
+        # Initialize base retriever (handles safety filter setup)
+        super().__init__(use_safety_filter=use_safety_filter)
 
         print(f"Initializing ChromaDB (local storage: {persist_dir})...")
 
@@ -51,13 +53,9 @@ class ChromaRetriever:
 
         self.collection_name = collection_name
         self.persist_dir = persist_dir
-        self.use_safety_filter = use_safety_filter
-        self.content_filter = ContentFilter() if use_safety_filter else None
 
         print(f"✓ Collection '{collection_name}' ready")
         print(f"✓ Current documents: {self.collection.count()}")
-        if use_safety_filter:
-            print("Safety filter: ENABLED")
 
     def index_documents(self, chunks: List[Dict], force_reindex: bool = False, quality_threshold: float = SafetyConfig.QUALITY_THRESHOLD):
         """
@@ -88,23 +86,8 @@ class ChromaRetriever:
                 metadata={"hnsw:space": "cosine"}
             )
 
-        # PHASE 1: Index-Time Filtering (remove known bad documents)
-        original_count = len(chunks)
-        if self.use_safety_filter and self.content_filter:
-            print(f"\n[Phase 1: Index-Time Filtering]")
-            print(f"Pre-filtering {original_count} chunks before indexing...")
-            chunks, reasons = self.content_filter.filter_before_indexing(
-                chunks,
-                quality_threshold=quality_threshold
-            )
-            removed_count = original_count - len(chunks)
-            print(f"✓ Kept {len(chunks)}/{original_count} chunks ({removed_count} filtered out)")
-
-            if reasons:
-                print(f"\nFiltered documents:")
-                for reason in reasons:
-                    print(f"  ✗ {reason}")
-            print()
+        # Apply index-time filtering (from base class)
+        chunks, removed_count = self.apply_index_time_filtering(chunks, quality_threshold)
 
         print(f"Indexing {len(chunks)} clean chunks into ChromaDB...")
         start_time = time.time()
@@ -149,7 +132,7 @@ class ChromaRetriever:
         print(f"✓ Indexing complete! Took {elapsed:.2f}s")
         print(f"✓ Persisted to disk: {self.collection.count()} chunks saved")
 
-        if self.use_safety_filter:
+        if self.use_safety_filter and removed_count > 0:
             print(f"✓ Index contains only high-quality documents (filtered {removed_count} at index-time)")
 
     def retrieve(self, query: str, top_k: int = RetrievalConfig.DEFAULT_TOP_K) -> Tuple[List[Dict], List[float], float]:

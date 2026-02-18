@@ -15,6 +15,8 @@ from src.retrieval.embedding_retriever import EmbeddingRetriever
 from src.retrieval.hybrid_retriever import HybridRetriever
 from src.retrieval.chroma_retriever import ChromaRetriever
 from src.config import LLMConfig, RetrievalConfig, UIConfig
+from src.utils.confidence import calculate_confidence
+from src.utils.formatting import print_answer_with_sources
 
 
 class ChildDevelopmentQA:
@@ -162,14 +164,8 @@ class ChildDevelopmentQA:
             for chunk, score in zip(retrieved_chunks, scores)
         ]
 
-        # Calculate confidence based on retrieval scores
-        avg_score = sum(scores) / len(scores)
-        if avg_score > RetrievalConfig.HIGH_CONFIDENCE_THRESHOLD:
-            confidence = 'high'
-        elif avg_score > RetrievalConfig.MEDIUM_CONFIDENCE_THRESHOLD:
-            confidence = 'medium'
-        else:
-            confidence = 'low'
+        # Calculate confidence based on retrieval scores (from confidence utility)
+        confidence = calculate_confidence(scores)
 
         total_time = time.time() - total_start_time
 
@@ -205,23 +201,8 @@ class ChildDevelopmentQA:
                 print("\nThinking...")
                 result = self.answer_question(question)
 
-                print("\n" + "-"*60)
-                print("ANSWER:")
-                print("-"*60)
-                print(result['answer'])
-
-                print("\n" + "-"*60)
-                print("SOURCES:")
-                print("-"*60)
-                for source in result['sources']:
-                    age_str = f" (Age: {source['age_range']} months)" if source['age_range'] else ""
-                    score_str = f" [score: {source['score']:.3f}]" if 'score' in source else ""
-                    print(f"  • {source['filename']}{age_str}{score_str}")
-
-                print("\n" + "-"*60)
-                print(f"Strategy: {result['strategy']} | Confidence: {result['confidence']}")
-                print(f"Retrieval: {result['retrieval_time']*1000:.2f}ms | Generation: {result.get('generation_time', 0):.1f}s | Total: {result.get('total_time', 0):.1f}s")
-                print("-"*60)
+                # Use formatting utility for consistent display
+                print_answer_with_sources(result, show_separator=False)
 
             except KeyboardInterrupt:
                 print("\n\nGoodbye!")
@@ -234,23 +215,8 @@ class ChildDevelopmentQA:
         """Answer a single question and exit."""
         result = self.answer_question(question)
 
-        print("\n" + "="*60)
-        print("ANSWER:")
-        print("="*60)
-        print(result['answer'])
-
-        print("\n" + "="*60)
-        print("SOURCES:")
-        print("="*60)
-        for source in result['sources']:
-            age_str = f" (Age: {source['age_range']} months)" if source['age_range'] else ""
-            score_str = f" [score: {source['score']:.3f}]" if 'score' in source else ""
-            print(f"  • {source['filename']}{age_str}{score_str}")
-
-        print("\n" + "="*60)
-        print(f"Strategy: {result['strategy']} | Confidence: {result['confidence']}")
-        print(f"Retrieval: {result['retrieval_time']*1000:.2f}ms | Generation: {result.get('generation_time', 0):.1f}s | Total: {result.get('total_time', 0):.1f}s")
-        print("="*60)
+        # Use formatting utility for consistent display
+        print_answer_with_sources(result, show_separator=True)
 
 
 def main():

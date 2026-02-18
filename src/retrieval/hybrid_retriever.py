@@ -8,7 +8,8 @@ from rank_bm25 import BM25Okapi
 import numpy as np
 from typing import List, Dict, Tuple
 import time
-from src.safety.content_filter import ContentFilter
+from src.retrieval.base_retriever import BaseRetriever
+from src.retrieval.scoring_utils import normalize_bm25_scores
 from src.retrieval.age_utils import (
     add_age_metadata_to_chunks,
     extract_age_from_query,
@@ -17,7 +18,7 @@ from src.retrieval.age_utils import (
 from src.config import RetrievalConfig, SafetyConfig
 
 
-class HybridRetriever:
+class HybridRetriever(BaseRetriever):
     """
     Hybrid retrieval combining BM25 (keyword) and embeddings (semantic).
 
@@ -41,6 +42,9 @@ class HybridRetriever:
             embedding_weight: Weight for embedding scores 0-1 (defaults to config)
             use_safety_filter: Whether to apply content filtering (defaults to config)
         """
+        # Initialize base retriever (handles safety filter setup)
+        super().__init__(use_safety_filter=use_safety_filter)
+
         print(f"Loading embedding model: {model_name}...")
         self.model = SentenceTransformer(model_name)
         self.bm25_weight = bm25_weight
@@ -49,11 +53,7 @@ class HybridRetriever:
         self.embeddings = None
         self.bm25 = None
         self.tokenized_corpus = None
-        self.use_safety_filter = use_safety_filter
-        self.content_filter = ContentFilter() if use_safety_filter else None
         print(f"Hybrid retriever initialized (BM25: {bm25_weight}, Embedding: {embedding_weight})")
-        if use_safety_filter:
-            print("Safety filter: ENABLED")
 
     def index_documents(self, chunks: List[Dict], quality_threshold: float = SafetyConfig.QUALITY_THRESHOLD):
         """
@@ -68,23 +68,8 @@ class HybridRetriever:
             chunks: List of document chunks with text and metadata
             quality_threshold: Minimum quality score 0-1 (defaults to config)
         """
-        # PHASE 1: Index-Time Filtering
-        original_count = len(chunks)
-        if self.use_safety_filter and self.content_filter:
-            print(f"\n[Phase 1: Index-Time Filtering]")
-            print(f"Pre-filtering {original_count} chunks before indexing...")
-            chunks, reasons = self.content_filter.filter_before_indexing(
-                chunks,
-                quality_threshold=quality_threshold
-            )
-            removed_count = original_count - len(chunks)
-            print(f"✓ Kept {len(chunks)}/{original_count} chunks ({removed_count} filtered out)")
-
-            if reasons:
-                print(f"\nFiltered documents:")
-                for reason in reasons:
-                    print(f"  ✗ {reason}")
-            print()
+        # Apply index-time filtering (from base class)
+        chunks, removed_count = self.apply_index_time_filtering(chunks, quality_threshold)
 
         print(f"Indexing {len(chunks)} clean chunks with hybrid approach...")
         start_time = time.time()
@@ -111,8 +96,7 @@ class HybridRetriever:
         elapsed = time.time() - start_time
         print(f"Hybrid indexing complete! Took {elapsed:.2f}s")
 
-        if self.use_safety_filter:
-            removed_count = original_count - len(chunks)
+        if self.use_safety_filter and removed_count > 0:
             print(f"✓ Index contains only high-quality documents (filtered {removed_count} at index-time)")
 
     def retrieve(self, query: str, top_k: int = RetrievalConfig.DEFAULT_TOP_K) -> Tuple[List[Dict], List[float], float]:
@@ -161,7 +145,7 @@ class HybridRetriever:
             bm25_scores = filtered_bm25.get_scores(tokenized_query)
 
             query_embedding = self.model.encode(query, convert_to_numpy=True)
-            embedding_scores = self._cosine_similarity(query_embedding, filtered_embeddings)
+            embedding_scores = self.cosine_similarity(query_embedding, filtered_embeddings)
         else:
             # No age filtering, use all chunks
             age_matched_indices = list(range(len(self.chunks)))
@@ -172,13 +156,10 @@ class HybridRetriever:
 
             # Embedding similarity scores
             query_embedding = self.model.encode(query, convert_to_numpy=True)
-            embedding_scores = self._cosine_similarity(query_embedding, self.embeddings)
+            embedding_scores = self.cosine_similarity(query_embedding, self.embeddings)
 
-        # Normalize BM25 scores to 0-1 range
-        if bm25_scores.max() > 0:
-            bm25_scores_norm = bm25_scores / bm25_scores.max()
-        else:
-            bm25_scores_norm = bm25_scores
+        # Normalize BM25 scores to 0-1 range (from scoring_utils)
+        bm25_scores_norm = normalize_bm25_scores(bm25_scores)
 
         # Combine scores
         hybrid_scores = (
@@ -199,26 +180,6 @@ class HybridRetriever:
         retrieval_time = time.time() - start_time
 
         return retrieved_chunks, scores, retrieval_time
-
-    def _cosine_similarity(self, query_vec: np.ndarray, doc_vecs: np.ndarray) -> np.ndarray:
-        """
-        Calculate cosine similarity between query and documents.
-
-        Args:
-            query_vec: Query embedding vector
-            doc_vecs: Document embedding matrix
-
-        Returns:
-            Array of similarity scores
-        """
-        # Normalize vectors
-        query_norm = query_vec / np.linalg.norm(query_vec)
-        doc_norms = doc_vecs / np.linalg.norm(doc_vecs, axis=1, keepdims=True)
-
-        # Calculate cosine similarity
-        similarities = np.dot(doc_norms, query_norm)
-
-        return similarities
 
     def get_stats(self) -> Dict:
         """Get statistics about the indexed documents."""
