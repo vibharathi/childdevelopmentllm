@@ -48,7 +48,6 @@ class ContentFilter:
     QUALITY_INDICATORS = [
         r"typically",
         r"most (infants|babies|children)",
-        r"generally",
         r"developmental milestone",
         r"pediatric",
         r"around \d+ months"

@@ -120,11 +120,13 @@ class UIConfig:
     LOW_CONFIDENCE_MESSAGE = (
         "I don't have specific information about that in my knowledge base. "
         "Please try asking about developmental milestones for children aged 0-36 months."
+        "You can also direct your questions to a pediatrician."
     )
 
     NO_AGE_MATCH_MESSAGE = (
         "I don't have information for that specific age in my knowledge base. "
         "I can help with developmental milestones for children aged 0-36 months."
+        "You can also direct your questions to a pediatrician."
     )
 
 

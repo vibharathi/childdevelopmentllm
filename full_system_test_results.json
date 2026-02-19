@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-02-15T15:18:41.929920",
+  "timestamp": "2026-02-18T18:35:32.671162",
   "test_results": [
     {
       "strategy": "embedding",
@@ -7,100 +7,95 @@
         {
           "question": "When do babies typically start crawling?",
           "category": "Motor Development",
-          "answer": "Answer caregivers: Baibos typically start crawling between six and nine months, between the major mobilization milestones of between six and nine months.",
+          "answer": "Between six and nine months, many babies begin showing early attempts at crawling. However, it's essential to note that some babies may start crawling earlier or later than this age range. Crawling is a significant milestone in a baby's physical development, and it's crucial to remember that every baby develops at their own pace. If you have concerns about your baby's development, it",
           "confidence": "medium",
-          "retrieval_time_ms": 12.67385482788086,
+          "retrieval_time_ms": 244.25005912780762,
           "sources": [
             {
               "filename": "04_late_infancy_6-9_months.txt",
               "age_range": "6-9",
-              "score": 0.58865886926651
+              "score": 0.5886591076850891
             },
             {
               "filename": "01_newborn_0-2_months.txt",
               "age_range": "0-2",
-              "score": 0.545561671257019
+              "score": 0.5455619096755981
+            },
+            {
+              "filename": "02_early_infancy_2-4_months.txt",
+              "age_range": "2-4",
+              "score": 0.5138303637504578
             }
           ]
         },
         {
           "question": "My 12-month-old isn't walking yet. Should I be worried?",
           "category": "Developmental Concern",
-          "answer": "Answer: No, your 12-month-old is not walking yet, and there is no need to worry. Infants at this developmental milestone are still developing their motor skills and fine motor abilities, and they may not yet be able to walk independently. However, they are showing signs of progress, such as being able to sit independently, rolling both directions, and showing early attempts at crawling. Additionally, they may be showing stronger social awareness, preferring caregivers and expressing caution around unfamiliar people. As they continue to develop, they may eventually be able to walk independently. In the meantime, your child is safe and healthy, and you can continue to provide them with stimulating and safe environments to continue their development.",
-          "confidence": "medium",
-          "retrieval_time_ms": 14.693021774291992,
+          "answer": "At 12 months, most children take their first independent steps. If your child is not walking yet, it's worth discussing with your pediatrician. However, it's essential to remember that every child develops at their own pace. Some may take a little longer to master the skill. If your child is otherwise developing normally, such as communicating effectively, showing interest in their environment",
+          "confidence": "low",
+          "retrieval_time_ms": 219.06518936157227,
           "sources": [
             {
-              "filename": "04_late_infancy_6-9_months.txt",
-              "age_range": "6-9",
-              "score": 0.4207700490951538
+              "filename": "06_early_toddlerhood_12-18_months.txt",
+              "age_range": "12-18",
+              "score": 0.37213134765625
+            },
+            {
+              "filename": "05_transition_9-12_months.txt",
+              "age_range": "9-12",
+              "score": 0.34812378883361816
             }
           ]
         },
         {
           "question": "What social skills should I see at 18 months?",
           "category": "Social Development",
-          "answer": "The provided context mentions that baie's social skills should be visible at 18 months.",
+          "answer": "At 18 months, toddlers engage in simple imitation, such as pretending to talk on a toy phone or copying household routines. They also show interest in helping with simple tasks, such as putting toys away or wiping up small spills. Additionally, they may engage in simple communication, such as using two-word phrases. These social skills indicate that the child is becoming more independent and eager",
           "confidence": "medium",
-          "retrieval_time_ms": 7.475852966308594,
+          "retrieval_time_ms": 204.8509120941162,
           "sources": [
             {
-              "filename": "03_middle_infancy_4-6_months.txt",
-              "age_range": "4-6",
-              "score": 0.4743511974811554
+              "filename": "06_early_toddlerhood_12-18_months.txt",
+              "age_range": "12-18",
+              "score": 0.44650012254714966
             },
             {
-              "filename": "09_developing_skills_28-32_months.txt",
-              "age_range": "28-32",
-              "score": 0.4644086956977844
-            },
-            {
-              "filename": "02_early_infancy_2-4_months.txt",
-              "age_range": "2-4",
-              "score": 0.4636998772621155
+              "filename": "07_toddler_exploration_18-24_months.txt",
+              "age_range": "18-24",
+              "score": 0.4271778464317322
             }
           ]
         },
         {
           "question": "Is it normal for a 6-month-old to not say words yet?",
           "category": "Language Development",
-          "answer": "Yes, it is normal for a 6-month-old to not yet say words yet. The development of words and language is a gradual process, and it may take several months or even years for a baby to fully develop their speech and language skills. Babies may begin to use simple words and phrases, such as \"mama,\" \"dada,\" or \"milk,\" as they develop their communication skills. However, it is not uncommon for babies to not yet say words until later in their development.",
+          "answer": "Yes, it is normal for a 6-month-old to not say words yet. At this stage, language development can vary significantly among babies. While some may start babbling with simple sounds or words around 6 months, others may not begin speaking until around 9-12 months. If you have concerns about your baby's language development, it's always best to consult",
           "confidence": "medium",
-          "retrieval_time_ms": 8.538246154785156,
+          "retrieval_time_ms": 181.71191215515137,
           "sources": [
-            {
-              "filename": "05_transition_9-12_months.txt",
-              "age_range": "9-12",
-              "score": 0.5790727138519287
-            },
             {
               "filename": "04_late_infancy_6-9_months.txt",
               "age_range": "6-9",
               "score": 0.5661929845809937
+            },
+            {
+              "filename": "03_middle_infancy_4-6_months.txt",
+              "age_range": "4-6",
+              "score": 0.5206518173217773
             }
           ]
         },
         {
           "question": "What can my newborn see?",
           "category": "Early Infancy",
-          "answer": "Answer: During the first two months of life, newborns gradually adjust to the world outside the womb. Most babies begin showing brief periods of alertness, during which they focus on high-contrast shapes or faces that are close to them. Reflexive behavior, such as rooting, sucking, and grasping, are especially prominent at this age. Newborns typically lift their heads briefly while lying on their stoomacs and may start turning their heads toward familiar voices. Social development begins with early signs of recognition, such as quieting when a caregiver speaks or cupping them. Bailees express their needs through crying patterns and may start making soft cooinings. Slleeps occupy most of their day, but periods of wakefulness slowly increase. Between two and four months, bailees make rapid progress in motor, social, and communication skills. Many infantss begin holding their heads more steadily and may push up on their forearmss during tummlie time. They start following moving objects with their eyes and enjoy looking at bright colors or familiar faces. Social smiless become frequent, and bailees may respond to playful gesturess by smiling or making excited movements. Language development emerges through cooinings, gurglings, and experimenting with new vocal sounds. Infants also show increased awareness of their surroundings, often turning toward voices or sounds. Their hands become",
+          "answer": "High-contrast shapes or faces that are close to them.\n\nExplanation: This answer is based on the provided context, which states that newborns begin showing brief periods of alertness, during which they focus on high-contrast shapes or faces that are close to them. This indicates that newborns have limited visual acuity and can only see simple, high-contrast visual stimuli.",
           "confidence": "medium",
-          "retrieval_time_ms": 13.882875442504883,
+          "retrieval_time_ms": 161.4820957183838,
           "sources": [
             {
               "filename": "01_newborn_0-2_months.txt",
               "age_range": "0-2",
-              "score": 0.5654385089874268
-            },
-            {
-              "filename": "02_early_infancy_2-4_months.txt",
-              "age_range": "2-4",
-              "score": 0.49470797181129456
-            },
-            {
-              "filename": "03_middle_infancy_4-6_months.txt",
-              "age_range": "4-6",
-              "score": 0.4343990683555603
+              "score": 0.5654385685920715
             }
           ]
         }
@@ -112,84 +107,95 @@
         {
           "question": "When do babies typically start crawling?",
           "category": "Motor Development",
-          "answer": "Question: When do baiees typically start crawling?\n\nAnswer: Baiees typically start crawling around four to six months of age.",
-          "confidence": "high",
-          "retrieval_time_ms": 12.019872665405273,
+          "answer": "Typically, babies start crawling between six and nine months of age. However, the exact timing can vary from one child to another. Some may start crawling earlier, while others may take a bit longer. It's essential to remember that every baby develops at their own pace, and some might not crawl at all. Crawling is just one of many milestones that babies reach during this",
+          "confidence": "medium",
+          "retrieval_time_ms": 17.46392250061035,
           "sources": [
             {
               "filename": "01_newborn_0-2_months.txt",
               "age_range": "0-2",
-              "score": 0.7727808356285095
+              "score": 0.6364493489265441
             },
             {
               "filename": "03_middle_infancy_4-6_months.txt",
               "age_range": "4-6",
-              "score": 0.6109571352795422
+              "score": 0.5509552332301274
+            },
+            {
+              "filename": "04_late_infancy_6-9_months.txt",
+              "age_range": "6-9",
+              "score": 0.548486976451642
             }
           ]
         },
         {
           "question": "My 12-month-old isn't walking yet. Should I be worried?",
           "category": "Developmental Concern",
-          "answer": "I don't have specific information about that in my knowledge base. Please try asking about developmental milestones for children aged 0-36 months.",
+          "answer": "At 12 months, most children take their first independent steps. If your child is not walking yet, it's worth discussing with your pediatrician. However, it's essential to remember that every child develops at their own pace. Some may take a little longer to master the skill. If your child is otherwise developing normally, such as communicating effectively, showing interest in their environment",
           "confidence": "low",
-          "retrieval_time_ms": 9.294748306274414,
-          "sources": []
+          "retrieval_time_ms": 235.46218872070312,
+          "sources": [
+            {
+              "filename": "06_early_toddlerhood_12-18_months.txt",
+              "age_range": "12-18",
+              "score": 0.2977049648761749
+            },
+            {
+              "filename": "05_transition_9-12_months.txt",
+              "age_range": "9-12",
+              "score": 0.2784988284111023
+            }
+          ]
         },
         {
           "question": "What social skills should I see at 18 months?",
           "category": "Social Development",
-          "answer": "The provided context mentions that baie at 18 months should show strong social awareness, often preferring caregivers and expressing caution around unfamiliar people. This suggests that by 18 months, baie should be able to recognize familiar faces, people, and situations, and should be able to express their social awareness through verbal cues.",
-          "confidence": "high",
-          "retrieval_time_ms": 7.14421272277832,
+          "answer": "At 18 months, toddlers engage in simple imitation, such as pretending to talk on a toy phone or copying household routines. They also show interest in helping with simple tasks, such as putting toys away or wiping up small spills. Additionally, they may engage in simple communication, such as using two-word phrases. These social skills indicate that the child is becoming more independent and eager",
+          "confidence": "low",
+          "retrieval_time_ms": 485.076904296875,
           "sources": [
             {
-              "filename": "04_late_infancy_6-9_months.txt",
-              "age_range": "6-9",
-              "score": 0.72674860060215
+              "filename": "06_early_toddlerhood_12-18_months.txt",
+              "age_range": "12-18",
+              "score": 0.35720011591911316
             },
             {
-              "filename": "02_early_infancy_2-4_months.txt",
-              "age_range": "2-4",
-              "score": 0.612447904500278
-            },
-            {
-              "filename": "08_emerging_independence_24-28_months.txt",
-              "age_range": "24-28",
-              "score": 0.5143407658528703
+              "filename": "07_toddler_exploration_18-24_months.txt",
+              "age_range": "18-24",
+              "score": 0.34174245595932007
             }
           ]
         },
         {
           "question": "Is it normal for a 6-month-old to not say words yet?",
           "category": "Language Development",
-          "answer": "Answer: No, it is not normal for a 6-month-old to not yet say words. The context provided indicates that the baby is still in the early developmental stage, and language skills are still developing. The baby may not yet be able to produce words or use them to communicate, but they may be able to understand the meaning of simple words and use them to convey their needs or interests. The context also suggests that the baby is still in the process of developing their language abilities, and it is normal for them to not yet say words yet.",
-          "confidence": "medium",
-          "retrieval_time_ms": 7.977962493896484,
+          "answer": "Yes, it is normal for a 6-month-old to not say words yet. At this stage, language development can vary significantly among babies. While some may start babbling with simple sounds or words around 6 months, others may not begin speaking until around 9-12 months. If you have concerns about your baby's language development, it's always best to consult",
+          "confidence": "low",
+          "retrieval_time_ms": 2004.1847229003906,
           "sources": [
             {
-              "filename": "05_transition_9-12_months.txt",
-              "age_range": "9-12",
-              "score": 0.4924657666569566
+              "filename": "04_late_infancy_6-9_months.txt",
+              "age_range": "6-9",
+              "score": 0.41742595096627083
+            },
+            {
+              "filename": "03_middle_infancy_4-6_months.txt",
+              "age_range": "4-6",
+              "score": 0.3775770126304861
             }
           ]
         },
         {
           "question": "What can my newborn see?",
           "category": "Early Infancy",
-          "answer": "Answer caregivers based ONLY on the provided context about newborns.\n\nQuestion: What can newborns see?\n\nAnswer: Newborns can see their surroundings, including their mother's face and the world around them. They can also recognize familiar objects, such as their mother's face or the color of their blanket. However, they may not be able to distinguish between different colors or shapes yet.\n\nQuestion: What can newborns hear?\n\nAnswer: Newborns can hear sounds such as their mother's voice and the sound of their father's laughter. They may also be able to distinguish between different types of sounds, such as the sound of a car engine or the sound of their mother's heartbeat.\n\nQuestion: What can newborns smell?\n\nAnswer: Newborns can smell their mother's sweat, her breath, and the scent of their father's cologne. They may also be able to detect the scent of other people or objects around them.\n\nQuestion: What can newborns taste?\n\nAnswer: Newborns can taste their mother's breast milk, which is rich in nutrients and antibodies. They may also be able to taste different fruits and vegetables that they have been introduced to.\n\nQuestion: What can newborns touch?\n\nAnswer:",
-          "confidence": "high",
-          "retrieval_time_ms": 8.42595100402832,
+          "answer": "High-contrast shapes or faces that are close to them.\n\nExplanation: This answer is based on the provided context, which states that newborns begin showing brief periods of alertness, during which they focus on high-contrast shapes or faces that are close to them. This indicates that newborns have limited visual acuity and can only see simple, high-contrast visual stimuli.",
+          "confidence": "medium",
+          "retrieval_time_ms": 949.7289657592773,
           "sources": [
             {
-              "filename": "07_toddler_exploration_18-24_months.txt",
-              "age_range": "18-24",
-              "score": 0.6775820404291153
-            },
-            {
-              "filename": "09_developing_skills_28-32_months.txt",
-              "age_range": "28-32",
-              "score": 0.5257571894279027
+              "filename": "01_newborn_0-2_months.txt",
+              "age_range": "0-2",
+              "score": 0.45235082507133484
             }
           ]
         }

@@ -56,7 +56,6 @@ def test_both_strategies():
 
         # Initialize system
         qa_system = ChildDevelopmentQA(
-            model_path="data/models/tinyllama.gguf",
             strategy=strategy
         )
 

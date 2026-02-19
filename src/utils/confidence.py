@@ -16,9 +16,6 @@ def calculate_confidence(
     """
     Calculate confidence level based on retrieval scores.
 
-    Consolidates duplicate logic from main.py (lines 165-172) and
-    test_strategies.py (lines 97, 113).
-
     Args:
         scores: List of retrieval similarity scores
         high_threshold: Minimum avg score for 'high' confidence (defaults to config)
@@ -87,7 +84,6 @@ def calculate_confidence_for_strategy(
 def should_generate_answer(
     scores: List[float],
     strategy: str,
-    min_threshold: float = None
 ) -> bool:
     """
     Determine if retrieval scores are sufficient to generate an answer.
@@ -113,12 +109,12 @@ def should_generate_answer(
     if not scores:
         return False
 
-    if min_threshold is None:
-        # Use strategy-specific thresholds
-        min_threshold = (
-            RetrievalConfig.LOW_CONFIDENCE_THRESHOLD_HYBRID
-            if strategy == "hybrid"
-            else RetrievalConfig.LOW_CONFIDENCE_THRESHOLD
-        )
+
+    # Use strategy-specific thresholds
+    min_threshold = (
+        RetrievalConfig.LOW_CONFIDENCE_THRESHOLD_HYBRID
+        if strategy == "hybrid"
+        else RetrievalConfig.LOW_CONFIDENCE_THRESHOLD_EMBEDDING
+    )
 
     return scores[0] >= min_threshold

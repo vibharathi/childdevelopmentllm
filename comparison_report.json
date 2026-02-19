@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-02-15T14:34:41.257637",
+  "timestamp": "2026-02-18T18:04:42.270149",
   "comparison": {
     "embedding_strategy": {
-      "strategy": "Embedding-Based Retrieval",
+      "strategy": "ChromaDB Retrieval",
       "stats": {
-        "avg_retrieval_time_ms": 7.423496246337891,
-        "avg_top_score": 0.6249738037586212,
-        "avg_all_scores": 0.5600865602493286,
+        "avg_retrieval_time_ms": 175.8209228515625,
+        "avg_top_score": 0.5287912011146545,
+        "avg_all_scores": 0.508133480946223,
         "num_questions": 5
       },
       "results": [
@@ -14,27 +14,28 @@
           "question": "When do babies start crawling?",
           "category": "Motor Skills",
           "expected_age": "6-9 months",
-          "top_score": 0.7055091857910156,
-          "avg_score": 0.6128321290016174,
-          "retrieval_time_ms": 8.814811706542969,
+          "top_score": 0.5911740064620972,
+          "avg_score": 0.552250345547994,
+          "confidence": "medium",
+          "retrieval_time_ms": 301.7258644104004,
           "retrieved_chunks": [
-            {
-              "source": "noisy_alt_movements.txt",
-              "age_range": null,
-              "score": 0.7055091857910156,
-              "text_preview": "Early Movement Claims (0\u201312 Months)\n\nSome sources report that most infants begin walking independent"
-            },
             {
               "source": "04_late_infancy_6-9_months.txt",
               "age_range": "6-9",
-              "score": 0.591174304485321,
+              "score": 0.5911740064620972,
               "text_preview": "Between six and nine months, infants often reach major mobility milestones. Many begin sitting indep"
             },
             {
               "source": "01_newborn_0-2_months.txt",
               "age_range": "0-2",
-              "score": 0.5418128967285156,
+              "score": 0.5418127775192261,
               "text_preview": "During the first two months of life, newborns gradually adjust to the world outside the womb. Most b"
+            },
+            {
+              "source": "02_early_infancy_2-4_months.txt",
+              "age_range": "2-4",
+              "score": 0.5237642526626587,
+              "text_preview": "Between two and four months, babies make rapid progress in motor, social, and communication skills. "
             }
           ]
         },
@@ -42,26 +43,21 @@
           "question": "What can a 6-month-old baby do?",
           "category": "General Milestone",
           "expected_age": "6 months",
-          "top_score": 0.5923133492469788,
-          "avg_score": 0.5693108836809794,
-          "retrieval_time_ms": 7.272243499755859,
+          "top_score": 0.5609807372093201,
+          "avg_score": 0.5578097105026245,
+          "confidence": "medium",
+          "retrieval_time_ms": 135.99395751953125,
           "retrieved_chunks": [
-            {
-              "source": "05_transition_9-12_months.txt",
-              "age_range": "9-12",
-              "score": 0.5923133492469788,
-              "text_preview": "From nine to twelve months, babies become increasingly mobile and intentional in their actions. Many"
-            },
             {
               "source": "04_late_infancy_6-9_months.txt",
               "age_range": "6-9",
-              "score": 0.5609807968139648,
+              "score": 0.5609807372093201,
               "text_preview": "Between six and nine months, infants often reach major mobility milestones. Many begin sitting indep"
             },
             {
               "source": "03_middle_infancy_4-6_months.txt",
               "age_range": "4-6",
-              "score": 0.5546385049819946,
+              "score": 0.554638683795929,
               "text_preview": "From four to six months, infants typically gain better control over their bodies and show growing cu"
             }
           ]
@@ -70,27 +66,22 @@
           "question": "When should my toddler start talking?",
           "category": "Language Development",
           "expected_age": "12-18 months",
-          "top_score": 0.6168025732040405,
-          "avg_score": 0.6012604832649231,
-          "retrieval_time_ms": 7.010221481323242,
+          "top_score": 0.6168027520179749,
+          "avg_score": 0.5700733959674835,
+          "confidence": "medium",
+          "retrieval_time_ms": 150.0389575958252,
           "retrieved_chunks": [
             {
               "source": "06_early_toddlerhood_12-18_months.txt",
               "age_range": "12-18",
-              "score": 0.6168025732040405,
+              "score": 0.6168027520179749,
               "text_preview": "Between twelve and eighteen months, toddlers gain confidence in their mobility and communication. Ma"
             },
             {
-              "source": "08_emerging_independence_24-28_months.txt",
-              "age_range": "24-28",
-              "score": 0.5972510576248169,
-              "text_preview": "Between twenty-four and twenty-eight months, children show notable gains in language, coordination, "
-            },
-            {
-              "source": "09_developing_skills_28-32_months.txt",
-              "age_range": "28-32",
-              "score": 0.5897278189659119,
-              "text_preview": "From twenty-eight to thirty-two months, children refine many of the skills gained earlier. Their voc"
+              "source": "05_transition_9-12_months.txt",
+              "age_range": "9-12",
+              "score": 0.5233440399169922,
+              "text_preview": "From nine to twelve months, babies become increasingly mobile and intentional in their actions. Many"
             }
           ]
         },
@@ -98,27 +89,22 @@
           "question": "Is it normal for my 12-month-old not to walk yet?",
           "category": "Developmental Concern",
           "expected_age": "12 months",
-          "top_score": 0.7358927130699158,
-          "avg_score": 0.5495427151521047,
-          "retrieval_time_ms": 6.746053695678711,
+          "top_score": 0.42849838733673096,
+          "avg_score": 0.4236949682235718,
+          "confidence": "medium",
+          "retrieval_time_ms": 146.81696891784668,
           "retrieved_chunks": [
-            {
-              "source": "noisy_alt_movements.txt",
-              "age_range": null,
-              "score": 0.7358927130699158,
-              "text_preview": "Early Movement Claims (0\u201312 Months)\n\nSome sources report that most infants begin walking independent"
-            },
-            {
-              "source": "04_late_infancy_6-9_months.txt",
-              "age_range": "6-9",
-              "score": 0.484237402677536,
-              "text_preview": "Between six and nine months, infants often reach major mobility milestones. Many begin sitting indep"
-            },
             {
               "source": "06_early_toddlerhood_12-18_months.txt",
               "age_range": "12-18",
-              "score": 0.4284980297088623,
+              "score": 0.42849838733673096,
               "text_preview": "Between twelve and eighteen months, toddlers gain confidence in their mobility and communication. Ma"
+            },
+            {
+              "source": "05_transition_9-12_months.txt",
+              "age_range": "9-12",
+              "score": 0.4188915491104126,
+              "text_preview": "From nine to twelve months, babies become increasingly mobile and intentional in their actions. Many"
             }
           ]
         },
@@ -126,27 +112,22 @@
           "question": "What social skills should I see at 18 months?",
           "category": "Social Development",
           "expected_age": "18 months",
-          "top_score": 0.4743511974811554,
-          "avg_score": 0.46748659014701843,
-          "retrieval_time_ms": 7.274150848388672,
+          "top_score": 0.44650012254714966,
+          "avg_score": 0.4368389844894409,
+          "confidence": "medium",
+          "retrieval_time_ms": 144.52886581420898,
           "retrieved_chunks": [
             {
-              "source": "03_middle_infancy_4-6_months.txt",
-              "age_range": "4-6",
-              "score": 0.4743511974811554,
-              "text_preview": "From four to six months, infants typically gain better control over their bodies and show growing cu"
+              "source": "06_early_toddlerhood_12-18_months.txt",
+              "age_range": "12-18",
+              "score": 0.44650012254714966,
+              "text_preview": "Between twelve and eighteen months, toddlers gain confidence in their mobility and communication. Ma"
             },
             {
-              "source": "09_developing_skills_28-32_months.txt",
-              "age_range": "28-32",
-              "score": 0.4644086956977844,
-              "text_preview": "From twenty-eight to thirty-two months, children refine many of the skills gained earlier. Their voc"
-            },
-            {
-              "source": "02_early_infancy_2-4_months.txt",
-              "age_range": "2-4",
-              "score": 0.4636998772621155,
-              "text_preview": "Between two and four months, babies make rapid progress in motor, social, and communication skills. "
+              "source": "07_toddler_exploration_18-24_months.txt",
+              "age_range": "18-24",
+              "score": 0.4271778464317322,
+              "text_preview": "From eighteen to twenty-four months, toddlers become more independent and eager to experiment. Many "
             }
           ]
         }
@@ -155,9 +136,9 @@
     "hybrid_strategy": {
       "strategy": "Hybrid Retrieval (BM25 + Embeddings)",
       "stats": {
-        "avg_retrieval_time_ms": 6.908750534057617,
-        "avg_top_score": 0.7341573804616928,
-        "avg_all_scores": 0.6178666909545791,
+        "avg_retrieval_time_ms": 9.543085098266602,
+        "avg_top_score": 0.4465964550356091,
+        "avg_all_scores": 0.42617872787558886,
         "num_questions": 5
       },
       "results": [
@@ -165,27 +146,28 @@
           "question": "When do babies start crawling?",
           "category": "Motor Skills",
           "expected_age": "6-9 months",
-          "top_score": 0.7709064483642578,
-          "avg_score": 0.7055154902386964,
-          "retrieval_time_ms": 7.6351165771484375,
+          "top_score": 0.633450311422348,
+          "avg_score": 0.58335146657815,
+          "confidence": "medium",
+          "retrieval_time_ms": 9.255170822143555,
           "retrieved_chunks": [
             {
               "source": "01_newborn_0-2_months.txt",
               "age_range": "0-2",
-              "score": 0.7709064483642578,
+              "score": 0.633450311422348,
               "text_preview": "During the first two months of life, newborns gradually adjust to the world outside the womb. Most b"
-            },
-            {
-              "source": "noisy_alt_movements.txt",
-              "age_range": null,
-              "score": 0.7287017441404177,
-              "text_preview": "Early Movement Claims (0\u201312 Months)\n\nSome sources report that most infants begin walking independent"
             },
             {
               "source": "04_late_infancy_6-9_months.txt",
               "age_range": "6-9",
-              "score": 0.6169382782114137,
+              "score": 0.5961878888635399,
               "text_preview": "Between six and nine months, infants often reach major mobility milestones. Many begin sitting indep"
+            },
+            {
+              "source": "03_middle_infancy_4-6_months.txt",
+              "age_range": "4-6",
+              "score": 0.5204161994485619,
+              "text_preview": "From four to six months, infants typically gain better control over their bodies and show growing cu"
             }
           ]
         },
@@ -193,27 +175,22 @@
           "question": "What can a 6-month-old baby do?",
           "category": "General Milestone",
           "expected_age": "6 months",
-          "top_score": 0.7065556049346924,
-          "avg_score": 0.5943979231133659,
-          "retrieval_time_ms": 6.878852844238281,
+          "top_score": 0.43546148784532845,
+          "avg_score": 0.4329245651520759,
+          "confidence": "medium",
+          "retrieval_time_ms": 9.159326553344727,
           "retrieved_chunks": [
             {
-              "source": "noisy_language_expectations.txt",
-              "age_range": null,
-              "score": 0.7065556049346924,
-              "text_preview": "Early Language Expectations (0\u201336 Months)\n\nBeginning around 2 months old, many toddlers can comforta"
+              "source": "04_late_infancy_6-9_months.txt",
+              "age_range": "6-9",
+              "score": 0.43546148784532845,
+              "text_preview": "Between six and nine months, infants often reach major mobility milestones. Many begin sitting indep"
             },
             {
-              "source": "07_toddler_exploration_18-24_months.txt",
-              "age_range": "18-24",
-              "score": 0.5758509301601028,
-              "text_preview": "From eighteen to twenty-four months, toddlers become more independent and eager to experiment. Many "
-            },
-            {
-              "source": "05_transition_9-12_months.txt",
-              "age_range": "9-12",
-              "score": 0.5007872342453024,
-              "text_preview": "From nine to twelve months, babies become increasingly mobile and intentional in their actions. Many"
+              "source": "03_middle_infancy_4-6_months.txt",
+              "age_range": "4-6",
+              "score": 0.4303876424588233,
+              "text_preview": "From four to six months, infants typically gain better control over their bodies and show growing cu"
             }
           ]
         },
@@ -221,27 +198,22 @@
           "question": "When should my toddler start talking?",
           "category": "Language Development",
           "expected_age": "12-18 months",
-          "top_score": 0.7680788338184357,
-          "avg_score": 0.6063323275349424,
-          "retrieval_time_ms": 7.079124450683594,
+          "top_score": 0.4934420585632324,
+          "avg_score": 0.45605866611003876,
+          "confidence": "medium",
+          "retrieval_time_ms": 9.003877639770508,
           "retrieved_chunks": [
             {
-              "source": "01_newborn_0-2_months.txt",
-              "age_range": "0-2",
-              "score": 0.7680788338184357,
-              "text_preview": "During the first two months of life, newborns gradually adjust to the world outside the womb. Most b"
+              "source": "06_early_toddlerhood_12-18_months.txt",
+              "age_range": "12-18",
+              "score": 0.4934420585632324,
+              "text_preview": "Between twelve and eighteen months, toddlers gain confidence in their mobility and communication. Ma"
             },
             {
-              "source": "04_late_infancy_6-9_months.txt",
-              "age_range": "6-9",
-              "score": 0.5318219298276134,
-              "text_preview": "Between six and nine months, infants often reach major mobility milestones. Many begin sitting indep"
-            },
-            {
-              "source": "03_middle_infancy_4-6_months.txt",
-              "age_range": "4-6",
-              "score": 0.519096218958778,
-              "text_preview": "From four to six months, infants typically gain better control over their bodies and show growing cu"
+              "source": "05_transition_9-12_months.txt",
+              "age_range": "9-12",
+              "score": 0.4186752736568451,
+              "text_preview": "From nine to twelve months, babies become increasingly mobile and intentional in their actions. Many"
             }
           ]
         },
@@ -249,27 +221,22 @@
           "question": "Is it normal for my 12-month-old not to walk yet?",
           "category": "Developmental Concern",
           "expected_age": "12 months",
-          "top_score": 0.6984974145889282,
-          "avg_score": 0.5652419569007915,
-          "retrieval_time_ms": 6.586790084838867,
+          "top_score": 0.31342830142802347,
+          "avg_score": 0.3090876555984632,
+          "confidence": "low",
+          "retrieval_time_ms": 10.087966918945312,
           "retrieved_chunks": [
-            {
-              "source": "noisy_generic_advice.txt",
-              "age_range": null,
-              "score": 0.6984974145889282,
-              "text_preview": "General Development Advice\n\nMany caregivers notice developmental \u201cspurts,\u201d but these spurts do not f"
-            },
-            {
-              "source": "noisy_alt_movements.txt",
-              "age_range": null,
-              "score": 0.4992739382549514,
-              "text_preview": "Early Movement Claims (0\u201312 Months)\n\nSome sources report that most infants begin walking independent"
-            },
             {
               "source": "06_early_toddlerhood_12-18_months.txt",
               "age_range": "12-18",
-              "score": 0.49795451785849476,
+              "score": 0.31342830142802347,
               "text_preview": "Between twelve and eighteen months, toddlers gain confidence in their mobility and communication. Ma"
+            },
+            {
+              "source": "05_transition_9-12_months.txt",
+              "age_range": "9-12",
+              "score": 0.3047470097689029,
+              "text_preview": "From nine to twelve months, babies become increasingly mobile and intentional in their actions. Many"
             }
           ]
         },
@@ -277,27 +244,22 @@
           "question": "What social skills should I see at 18 months?",
           "category": "Social Development",
           "expected_age": "18 months",
-          "top_score": 0.72674860060215,
-          "avg_score": 0.6178457569850994,
-          "retrieval_time_ms": 6.363868713378906,
+          "top_score": 0.35720011591911316,
+          "avg_score": 0.3494712859392166,
+          "confidence": "low",
+          "retrieval_time_ms": 10.209083557128906,
           "retrieved_chunks": [
             {
-              "source": "04_late_infancy_6-9_months.txt",
-              "age_range": "6-9",
-              "score": 0.72674860060215,
-              "text_preview": "Between six and nine months, infants often reach major mobility milestones. Many begin sitting indep"
+              "source": "06_early_toddlerhood_12-18_months.txt",
+              "age_range": "12-18",
+              "score": 0.35720011591911316,
+              "text_preview": "Between twelve and eighteen months, toddlers gain confidence in their mobility and communication. Ma"
             },
             {
-              "source": "02_early_infancy_2-4_months.txt",
-              "age_range": "2-4",
-              "score": 0.612447904500278,
-              "text_preview": "Between two and four months, babies make rapid progress in motor, social, and communication skills. "
-            },
-            {
-              "source": "08_emerging_independence_24-28_months.txt",
-              "age_range": "24-28",
-              "score": 0.5143407658528703,
-              "text_preview": "Between twenty-four and twenty-eight months, children show notable gains in language, coordination, "
+              "source": "07_toddler_exploration_18-24_months.txt",
+              "age_range": "18-24",
+              "score": 0.34174245595932007,
+              "text_preview": "From eighteen to twenty-four months, toddlers become more independent and eager to experiment. Many "
             }
           ]
         }
@@ -306,10 +268,10 @@
   },
   "summary": {
     "winner_by_speed": "Hybrid",
-    "winner_by_relevance": "Hybrid",
+    "winner_by_relevance": "Embedding",
     "observations": [
-      "Hybrid strategy is faster by 0.51ms on average",
-      "Hybrid strategy has higher relevance scores by 0.109 on average"
+      "Hybrid strategy is faster by 166.28ms on average",
+      "Embedding strategy has higher relevance scores by 0.082 on average"
     ]
   }
 }
