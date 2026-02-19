@@ -223,18 +223,18 @@ Please try asking about developmental milestones for children aged 0-36 months."
 ```
 
 ## Comparison with 5 sample questions and verdict on each result for both strategies
-[text](Comparison_and_Verdict_for_five_sample_questions.txt)
+[Comparison and Verdict for 5 sample questions](Comparison_and_Verdict_for_five_sample_questions.txt)
 
 ## Notes on AI Usage
 I used Claude Code for this project. Initial prompt was the project specification that was provided; however, I made many improvements along the way, as can be seen in the commit history. 
-a. Its initial choice of the Tiny Llama model was not good, as it was making a lot of spelling mistakes and giving very short and sometimes unrelated answers. I switched the model to Llama 3.2. 
-c. Noisiness was being detected by the file name, but it should be detected by the content instead. I added a content filter which looks at things like implausible claims, keywords, etc. 
-b. I suggested the use of ChromaDB for the embeddings approach so that the indexing can be preserved across sessions.
-c. I added explicit age-based filtering, which improved the results greatly. 
-c. With a lot of repeated code in both the strategies, I asked it to refactor and extract it into utils. Moved all tests to dedicated test directory.
-d. The initial implementation, was doing query time filtering, which I felt is unnecessary because the noisy documents should not even be persisted in the database. So I requested it to change it to index time filtering instead. 
-e. I ran into an issue where Llama 3.2 was extremely slow on my Mac, so I wrote a benchmark and also enabled GPU acceleration to improve its performance.
-f. I made sure that constants are not hard-coded and unused code and empty directories are removed. 
+- Its initial choice of the Tiny Llama model was not good, as it was making a lot of spelling mistakes and giving very short and sometimes unrelated answers. I switched the model to Llama 3.2.
+- Noisiness was being detected by the file name, but it should be detected by the content instead. I added a content filter which looks at things like implausible claims, keywords, etc.
+- I suggested the use of ChromaDB for the embeddings approach so that the indexing can be preserved across sessions.
+- I added explicit age-based filtering, which improved the results greatly.
+- With a lot of repeated code in both the strategies, I asked it to refactor and extract it into utils. Moved all tests to dedicated test directory.
+- The initial implementation, was doing query time filtering, which I felt is unnecessary because the noisy documents should not even be persisted in the database. So I requested it to change it to index time filtering instead.
+- I ran into an issue where Llama 3.2 was extremely slow on my Mac, so I wrote a benchmark and also enabled GPU acceleration to improve its performance.
+- I made sure that constants are not hard-coded and unused code and empty directories are removed. 
 
 That being said, Claude is an excellent partner in coding, and I use it very heavily for all projects. It also acts as a brainstorming partner and teacher. However, it is important to check its work as it tends to produce too much redundant code which could affect performance. I also need to continually make sure to whet its design choices, break down work into digestable chunks and add sufficient tests. 
 
