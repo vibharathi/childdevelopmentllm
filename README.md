@@ -45,44 +45,61 @@ ChildDevelopmentLLM/
 
 ### Prerequisites
 
-- Python 3.8 or higher
-- macOS, Linux, or Windows
-- At least 4GB free disk space (for model files)
+- Python 3.9 or higher
+- macOS (Apple Silicon recommended for GPU acceleration), Linux, or Windows
+- ~4GB free disk space for the model file
 
 ### Installation
 
 1. **Clone the repository**
    ```bash
    git clone https://github.com/vibharathi/childdevelopmentllm.git
-   cd ChildDevelopmentLLM
+   cd childdevelopmentllm
    ```
 
-2. **Create a virtual environment**
+2. **Create and activate a virtual environment**
    ```bash
    python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   source venv/bin/activate        # macOS / Linux
+   # venv\Scripts\activate         # Windows
    ```
 
 3. **Install dependencies**
+
+   `llama-cpp-python` must be compiled with the right backend for your hardware.
+   Choose the command that matches your machine:
+
    ```bash
+   # macOS (Apple Silicon — enables Metal GPU acceleration, strongly recommended)
+   CMAKE_ARGS="-DGGML_METAL=on" pip install llama-cpp-python
+   pip install -r requirements.txt
+
+   # macOS (Intel) or Linux CPU-only
+   pip install llama-cpp-python
+   pip install -r requirements.txt
+
+   # Linux with CUDA GPU
+   CMAKE_ARGS="-DGGML_CUDA=on" pip install llama-cpp-python
    pip install -r requirements.txt
    ```
 
+   > **Note:** The Metal build compiles from source and takes 2–5 minutes.
+   > Without it, the model runs on CPU and each answer takes several minutes.
+
 4. **Download the LLM model**
 
-   Download a GGUF model (I used Llama-3.2-3B):
+   The `data/` directory is not included in the repo. Create it and download the model:
    ```bash
-   # Create models directory if not exists
    mkdir -p data/models
-
-   # Download model (example using wget or curl)
-   wget https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf -O data/models/llama-3.2-3b.gguf
-
+   curl -L https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf \
+        -o data/models/llama-3.2-3b.gguf
    ```
+
+   The file is ~2GB. If you don't have `curl`, replace it with `wget -O data/models/llama-3.2-3b.gguf <url>`.
 
 5. **Verify installation**
    ```bash
-   python -c "import sentence_transformers; print('Setup successful!')"
+   python -c "import llama_cpp; import chromadb; import sentence_transformers; print('Setup successful!')"
    ```
 
 ## Usage

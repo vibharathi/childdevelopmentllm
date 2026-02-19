@@ -1,21 +1,17 @@
 # Core dependencies
 numpy>=1.24.0
-scipy>=1.10.0
 
 # NLP and embeddings
 sentence-transformers>=2.2.0
-transformers>=4.30.0
 
 # Local LLM
 llama-cpp-python>=0.2.0
 
-# Vector search and retrieval
-faiss-cpu>=1.7.4
-rank-bm25>=0.2.2
+# Vector database
+chromadb>=0.4.0
 
-# Utilities
-tqdm>=4.65.0
-python-dotenv>=1.0.0
+# Retrieval
+rank-bm25>=0.2.2
 
 # Testing
 pytest>=7.3.0
