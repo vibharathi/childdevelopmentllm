@@ -6,18 +6,6 @@ A local prototype that answers caregiver questions about early childhood develop
 
 This system provides evidence-based answers to caregiver questions about developmental milestones, using a curated dataset of milestone reference texts. The system includes safety mechanisms to handle inappropriate queries and confidence scoring to provide appropriate fallbacks when uncertain.
 
-## Features
-
-- **Fully Local**: Runs entirely on your machine with no cloud API dependencies
-- **Three Retrieval Strategies**: ChromaDB, Embedding-based, and Hybrid (BM25 + embeddings)
-- **Age-Aware Filtering**: Automatically filters documents by age range from queries (e.g., "2 month old")
-- **GPU Acceleration**: Metal GPU support on Mac (M1/M2) for 10-100x faster inference
-- **Safety Layer**: Index-time filtering removes low-quality documents before indexing
-- **Confidence Scoring**: Two-tier system (gate check + confidence label) prevents hallucination
-- **Persistent Storage**: ChromaDB maintains indexed embeddings across sessions
-- **Clean Architecture**: Modern Python design with base classes, utilities, and zero code duplication
-- **Open Source**: Built entirely with free, open-source libraries
-
 ## Architecture
 1. **Chunking and DataLoading**
 utils/data_loader.py Each document is broken into chunks of 300 words, most docs are just 1 chunk since the doc size is small enough.
@@ -52,14 +40,6 @@ ChildDevelopmentLLM/
 ├── requirements.txt         # Python dependencies
 └── README.md               # This file
 ```
-
-## Dataset
-
-The system uses a curated dataset of early childhood milestone texts covering:
-- 10 age-specific milestone files (0-36 months)
-- 3 intentionally noisy files for robustness testing
-
-The dataset includes deliberate inconsistencies to test the system's ability to handle real-world data quality issues.
 
 ## Setup Instructions
 
@@ -160,8 +140,8 @@ pytest tests/
 - Requires disk space for vector storage
 - Conservative confidence scoring (appropriate for safety-critical domain)
 
-### Strategy 2: Hybrid Retrieval (BM25 + Embeddings)
-**Description**: Combines traditional keyword-based retrieval (BM25) with dense embeddings, using weighted score fusion optimized for conversational queries.
+### Strategy 2: Hybrid Retrieval (BM25 + In-memory Embeddings)
+**Description**: Combines traditional keyword-based retrieval (BM25) with dense in-memory embeddings, using weighted score fusion.
 
 **Implementation**:
 - BM25 for keyword matching (weight: 0.2)
@@ -236,7 +216,7 @@ I used Claude Code for this project. Initial prompt was the project specificatio
 - I ran into an issue where Llama 3.2 was extremely slow on my Mac, so I wrote a benchmark and also enabled GPU acceleration to improve its performance.
 - I made sure that constants are not hard-coded and unused code and empty directories are removed.
 
-That being said, Claude is an excellent partner in coding, and I use it very heavily for all projects.However, its best to have it explain and run design choices by you, break its work down into digestable chunks. While making big design changes, it might forget to make it in all places, so that is another thing to watch for. Lastly it produces a lot of repeated code and is verbose in general, so having it do a round of cleanup in the end - refactor, remove redundancies, make constants etc.
+That being said, Claude is an excellent partner in coding, and I use it very heavily for all projects. However, its best to have it explain and run design choices by you, break its work down into digestable chunks. While making big design changes, it might forget to make it in all places, so that is another thing to watch for. Lastly it produces a lot of repeated code and is verbose in general, so having it do a round of cleanup in the end - refactor, remove redundancies, make constants etc.
 
 ## Future Improvements
 
