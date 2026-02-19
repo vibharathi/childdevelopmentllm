@@ -253,7 +253,6 @@ MIT License - See LICENSE file for details
 ## Acknowledgments
 
 - Built with open-source models and libraries
-- Milestone data provided by Bezos Academy team.
 
 
 THANK YOU!
