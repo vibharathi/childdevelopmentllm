@@ -9,7 +9,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.utils.data_loader import load_milestone_data
 from src.utils.confidence import calculate_confidence
-from src.retrieval.embedding_retriever import EmbeddingRetriever
+from src.retrieval.chroma_retriever import ChromaRetriever
 from src.retrieval.hybrid_retriever import HybridRetriever
 from src.generation.llm import LocalLLM
 import json
@@ -151,7 +151,7 @@ def test_full_qa_pipeline(model_path, questions):
 
     pipeline_results = []
 
-    for strategy_name, retriever_class in [("Embedding", EmbeddingRetriever), ("Hybrid", HybridRetriever)]:
+    for strategy_name, retriever_class in [("Chroma", ChromaRetriever), ("Hybrid", HybridRetriever)]:
         print(f"\n{'='*60}")
         print(f"Strategy: {strategy_name}")
         print(f"{'='*60}")
@@ -261,11 +261,11 @@ def main():
     docs, chunks = load_milestone_data()
     print(f"Loaded {len(docs)} documents, {len(chunks)} chunks")
 
-    # Test embedding strategy
-    embedding_retriever = EmbeddingRetriever()
+    # Test chroma strategy
+    chroma_retriever = ChromaRetriever()
     embedding_results = test_retrieval_strategy(
-        embedding_retriever,
-        "Embedding-Based Retrieval",
+        chroma_retriever,
+        "ChromaDB Retrieval",
         chunks,
         TEST_QUESTIONS
     )

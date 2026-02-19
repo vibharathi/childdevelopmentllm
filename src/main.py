@@ -11,7 +11,6 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.utils.data_loader import load_milestone_data
 from src.generation.llm import LocalLLM
-from src.retrieval.embedding_retriever import EmbeddingRetriever
 from src.retrieval.hybrid_retriever import HybridRetriever
 from src.retrieval.chroma_retriever import ChromaRetriever
 from src.config import LLMConfig, RetrievalConfig, UIConfig

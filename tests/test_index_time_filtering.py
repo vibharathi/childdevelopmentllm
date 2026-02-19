@@ -11,7 +11,6 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src.utils.data_loader import load_milestone_data
 from src.retrieval.chroma_retriever import ChromaRetriever
-from src.retrieval.embedding_retriever import EmbeddingRetriever
 from src.retrieval.hybrid_retriever import HybridRetriever
 
 
@@ -49,37 +48,10 @@ def test_chroma_index_time_filtering():
     print()
 
 
-def test_embedding_index_time_filtering():
-    """Test EmbeddingRetriever with index-time filtering."""
-    print("\n" + "=" * 70)
-    print("TEST 2: Embedding Retriever - Index-Time Filtering")
-    print("=" * 70)
-
-    # Load data
-    print("\nLoading milestone data...")
-    docs, chunks = load_milestone_data()
-
-    # Initialize retriever (safety filter always enabled)
-    retriever = EmbeddingRetriever()
-
-    # Index with filtering
-    retriever.index_documents(chunks, quality_threshold=0.4)
-
-    # Check results
-    stats = retriever.get_stats()
-    print(f"\n{'=' * 70}")
-    print("RESULTS:")
-    print(f"{'=' * 70}")
-    print(f"Original chunks: {len(chunks)}")
-    print(f"Stored in index: {stats['num_chunks']}")
-    print(f"Filtered out: {len(chunks) - stats['num_chunks']}")
-    print()
-
-
 def test_hybrid_index_time_filtering():
     """Test HybridRetriever with index-time filtering."""
     print("\n" + "=" * 70)
-    print("TEST 3: Hybrid Retriever - Index-Time Filtering")
+    print("TEST 2: Hybrid Retriever - Index-Time Filtering")
     print("=" * 70)
 
     # Load data
@@ -106,7 +78,7 @@ def test_hybrid_index_time_filtering():
 def test_retrieval_quality():
     """Test that retrieval returns results from the filtered index."""
     print("\n" + "=" * 70)
-    print("TEST 4: Verify Retrieval Works on Filtered Index")
+    print("TEST 3: Verify Retrieval Works on Filtered Index")
     print("=" * 70)
 
     # Load data
@@ -148,7 +120,6 @@ def test_retrieval_quality():
 
 if __name__ == "__main__":
     test_chroma_index_time_filtering()
-    test_embedding_index_time_filtering()
     test_hybrid_index_time_filtering()
     test_retrieval_quality()
 
