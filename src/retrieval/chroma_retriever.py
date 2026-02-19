@@ -26,8 +26,7 @@ class ChromaRetriever(BaseRetriever):
     def __init__(
         self,
         collection_name: str = RetrievalConfig.CHROMA_COLLECTION_NAME,
-        persist_dir: str = RetrievalConfig.CHROMA_PERSIST_DIR,
-        use_safety_filter: bool = SafetyConfig.ENABLE_SAFETY_FILTER
+        persist_dir: str = RetrievalConfig.CHROMA_PERSIST_DIR
     ):
         """
         Initialize ChromaDB retriever.
@@ -35,10 +34,9 @@ class ChromaRetriever(BaseRetriever):
         Args:
             collection_name: Name of the collection (defaults to config)
             persist_dir: Local directory for persistent storage (defaults to config)
-            use_safety_filter: Whether to apply content filtering (defaults to config)
         """
-        # Initialize base retriever (handles safety filter setup)
-        super().__init__(use_safety_filter=use_safety_filter)
+        # Initialize base retriever (safety filter always enabled)
+        super().__init__()
 
         print(f"Initializing ChromaDB (local storage: {persist_dir})...")
 
@@ -60,12 +58,7 @@ class ChromaRetriever(BaseRetriever):
     def index_documents(self, chunks: List[Dict], force_reindex: bool = False, quality_threshold: float = SafetyConfig.QUALITY_THRESHOLD):
         """
         Index documents into ChromaDB with index-time filtering.
-
-        Documents are filtered BEFORE indexing to remove:
-        - Documents with disclaimers (unreliable content)
-        - Documents with implausible claims
-        - Documents below quality threshold
-
+        
         Args:
             chunks: List of document chunks with text and metadata
             force_reindex: If True, clear and re-index all documents
@@ -132,7 +125,7 @@ class ChromaRetriever(BaseRetriever):
         print(f"✓ Indexing complete! Took {elapsed:.2f}s")
         print(f"✓ Persisted to disk: {self.collection.count()} chunks saved")
 
-        if self.use_safety_filter and removed_count > 0:
+        if removed_count > 0:
             print(f"✓ Index contains only high-quality documents (filtered {removed_count} at index-time)")
 
     def retrieve(self, query: str, top_k: int = RetrievalConfig.DEFAULT_TOP_K) -> Tuple[List[Dict], List[float], float]:

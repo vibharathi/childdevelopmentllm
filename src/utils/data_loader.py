@@ -12,15 +12,14 @@ import re
 class MilestoneDocument:
     """Represents a single milestone document with metadata."""
 
-    def __init__(self, content: str, filename: str, age_range: str = None, is_noisy: bool = False):
+    def __init__(self, content: str, filename: str, age_range: str = None):
         self.content = content.strip()
         self.filename = filename
         self.age_range = age_range
-        self.is_noisy = is_noisy
         self.chunks = []
 
     def __repr__(self):
-        return f"MilestoneDocument(filename='{self.filename}', age_range='{self.age_range}', noisy={self.is_noisy})"
+        return f"MilestoneDocument(filename='{self.filename}', age_range='{self.age_range}')"
 
 
 class DataLoader:
@@ -41,9 +40,7 @@ class DataLoader:
             doc = self._load_document(filepath)
             self.documents.append(doc)
 
-        print(f"Loaded {len(self.documents)} documents:")
-        print(f"  - {len([d for d in self.documents if not d.is_noisy])} milestone documents")
-        print(f"  - {len([d for d in self.documents if d.is_noisy])} noisy documents")
+        print(f"Loaded {len(self.documents)} documents")
 
         return self.documents
 
@@ -55,35 +52,22 @@ class DataLoader:
         with open(filepath, 'r', encoding='utf-8') as f:
             content = f.read()
 
-        # Determine if noisy
-        is_noisy = filename.startswith("noisy_")
-
         # Extract age range from filename for milestone documents
         age_range = None
-        if not is_noisy:
-            age_match = re.search(r'(\d+(?:-\d+)?)[_\s]months?', filename)
+        age_match = re.search(r'(\d+(?:-\d+)?)[_\s]months?', filename)
+        if age_match:
+            age_range = age_match.group(1)
+        else:
+            # Try to extract from file number (e.g., 01_newborn_0-2_months)
+            age_match = re.search(r'_(\d+-\d+)_months', filename)
             if age_match:
                 age_range = age_match.group(1)
-            else:
-                # Try to extract from file number (e.g., 01_newborn_0-2_months)
-                age_match = re.search(r'_(\d+-\d+)_months', filename)
-                if age_match:
-                    age_range = age_match.group(1)
 
         return MilestoneDocument(
             content=content,
             filename=filename,
-            age_range=age_range,
-            is_noisy=is_noisy
+            age_range=age_range
         )
-
-    def get_clean_documents(self) -> List[MilestoneDocument]:
-        """Return only non-noisy milestone documents."""
-        return [doc for doc in self.documents if not doc.is_noisy]
-
-    def get_noisy_documents(self) -> List[MilestoneDocument]:
-        """Return only noisy documents."""
-        return [doc for doc in self.documents if doc.is_noisy]
 
     def chunk_documents(self, chunk_size: int = 300, overlap: int = 50) -> List[Dict]:
         """
@@ -107,7 +91,6 @@ class DataLoader:
                     'text': doc.content,
                     'source': doc.filename,
                     'age_range': doc.age_range,
-                    'is_noisy': doc.is_noisy,
                     'chunk_id': 0
                 })
             else:
@@ -123,7 +106,6 @@ class DataLoader:
                         'text': chunk_text,
                         'source': doc.filename,
                         'age_range': doc.age_range,
-                        'is_noisy': doc.is_noisy,
                         'chunk_id': chunk_id
                     })
 
@@ -134,14 +116,9 @@ class DataLoader:
 
     def get_document_stats(self) -> Dict:
         """Get statistics about the loaded documents."""
-        clean_docs = self.get_clean_documents()
-        noisy_docs = self.get_noisy_documents()
-
         stats = {
             'total_documents': len(self.documents),
-            'clean_documents': len(clean_docs),
-            'noisy_documents': len(noisy_docs),
-            'age_ranges': [doc.age_range for doc in clean_docs if doc.age_range],
+            'age_ranges': [doc.age_range for doc in self.documents if doc.age_range],
             'total_characters': sum(len(doc.content) for doc in self.documents),
             'avg_doc_length': sum(len(doc.content) for doc in self.documents) / len(self.documents) if self.documents else 0
         }

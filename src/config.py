@@ -52,7 +52,7 @@ class RetrievalConfig:
     EMBEDDING_DIM = 384  # Dimension of all-MiniLM-L6-v2 embeddings
 
     # Confidence thresholds
-    LOW_CONFIDENCE_THRESHOLD = 0.3  # Minimum score to proceed with generation (embedding strategy)
+    LOW_CONFIDENCE_THRESHOLD_EMBEDDING = 0.3  # Minimum score to proceed with generation (embedding strategy)
     LOW_CONFIDENCE_THRESHOLD_HYBRID = 0.25  # Hybrid scores tend to be lower
     HIGH_CONFIDENCE_THRESHOLD = 0.6  # Score for "high confidence" label
     MEDIUM_CONFIDENCE_THRESHOLD = 0.4  # Score for "medium confidence" label
@@ -75,7 +75,6 @@ class SafetyConfig:
     """Configuration for content filtering and safety checks."""
 
     # Index-time filtering
-    ENABLE_SAFETY_FILTER = True  # Apply safety filter during indexing
     QUALITY_THRESHOLD = 0.4  # Minimum quality score (0-1) for documents
 
     # Filter settings
@@ -140,13 +139,13 @@ def validate_config():
     assert abs(total_weight - 1.0) < 0.01, f"Hybrid weights must sum to 1.0, got {total_weight}"
 
     # Check thresholds are in valid range
-    assert 0 <= RetrievalConfig.LOW_CONFIDENCE_THRESHOLD <= 1, "Low confidence threshold must be 0-1"
+    assert 0 <= RetrievalConfig.LOW_CONFIDENCE_THRESHOLD_EMBEDDING <= 1, "Low confidence threshold must be 0-1"
     assert 0 <= RetrievalConfig.HIGH_CONFIDENCE_THRESHOLD <= 1, "High confidence threshold must be 0-1"
     assert 0 <= RetrievalConfig.MEDIUM_CONFIDENCE_THRESHOLD <= 1, "Medium confidence threshold must be 0-1"
 
     # Check threshold ordering
     assert (
-        RetrievalConfig.LOW_CONFIDENCE_THRESHOLD
+        RetrievalConfig.LOW_CONFIDENCE_THRESHOLD_EMBEDDING
         <= RetrievalConfig.MEDIUM_CONFIDENCE_THRESHOLD
         <= RetrievalConfig.HIGH_CONFIDENCE_THRESHOLD
     ), "Thresholds must be in ascending order: low <= medium <= high"

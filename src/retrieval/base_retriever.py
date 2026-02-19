@@ -20,17 +20,14 @@ class BaseRetriever(ABC):
     - Common interface methods
     """
 
-    def __init__(self, use_safety_filter: bool = SafetyConfig.ENABLE_SAFETY_FILTER):
+    def __init__(self):
         """
         Initialize common retriever components.
 
-        Args:
-            use_safety_filter: Whether to apply content filtering (defaults to config)
+        Safety filtering is always enabled to ensure high-quality results.
         """
-        self.use_safety_filter = use_safety_filter
-        self.content_filter = ContentFilter() if use_safety_filter else None
-        if use_safety_filter:
-            print("Safety filter: ENABLED")
+        self.content_filter = ContentFilter()
+        print("Safety filter: ENABLED")
 
     def apply_index_time_filtering(
         self,
@@ -39,8 +36,6 @@ class BaseRetriever(ABC):
     ) -> Tuple[List[Dict], int]:
         """
         Apply index-time filtering to remove low-quality documents.
-
-        Consolidates 48 lines of duplicate logic from 3 retrievers.
 
         Documents are filtered BEFORE indexing to remove:
         - Documents with disclaimers (unreliable content)
@@ -56,27 +51,24 @@ class BaseRetriever(ABC):
         """
         original_count = len(chunks)
 
-        if self.use_safety_filter and self.content_filter:
-            print(f"\n[Phase 1: Index-Time Filtering]")
-            print(f"Pre-filtering {original_count} chunks before indexing...")
+        print(f"\n[Phase 1: Index-Time Filtering]")
+        print(f"Pre-filtering {original_count} chunks before indexing...")
 
-            chunks, reasons = self.content_filter.filter_before_indexing(
-                chunks,
-                quality_threshold=quality_threshold
-            )
+        chunks, reasons = self.content_filter.filter_before_indexing(
+            chunks,
+            quality_threshold=quality_threshold
+        )
 
-            removed_count = original_count - len(chunks)
-            print(f"✓ Kept {len(chunks)}/{original_count} chunks ({removed_count} filtered out)")
+        removed_count = original_count - len(chunks)
+        print(f"✓ Kept {len(chunks)}/{original_count} chunks ({removed_count} filtered out)")
 
-            if reasons:
-                print(f"\nFiltered documents:")
-                for reason in reasons:
-                    print(f"  ✗ {reason}")
-            print()
+        if reasons:
+            print(f"\nFiltered documents:")
+            for reason in reasons:
+                print(f"  ✗ {reason}")
+        print()
 
-            return chunks, removed_count
-
-        return chunks, 0
+        return chunks, removed_count
 
     @staticmethod
     def cosine_similarity(query_vec: np.ndarray, doc_vecs: np.ndarray) -> np.ndarray:

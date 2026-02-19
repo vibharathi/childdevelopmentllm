@@ -19,16 +19,15 @@ class EmbeddingRetriever(BaseRetriever):
     then retrieves based on cosine similarity.
     """
 
-    def __init__(self, model_name: str = "all-MiniLM-L6-v2", use_safety_filter: bool = SafetyConfig.ENABLE_SAFETY_FILTER):
+    def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
         """
         Initialize the embedding retriever.
 
         Args:
             model_name: Sentence-transformer model name
-            use_safety_filter: Whether to apply content filtering (defaults to config)
         """
-        # Initialize base retriever (handles safety filter setup)
-        super().__init__(use_safety_filter=use_safety_filter)
+        # Initialize base retriever (safety filter always enabled)
+        super().__init__()
 
         print(f"Loading embedding model: {model_name}...")
         self.model = SentenceTransformer(model_name)
@@ -68,7 +67,7 @@ class EmbeddingRetriever(BaseRetriever):
         elapsed = time.time() - start_time
         print(f"Indexing complete! Took {elapsed:.2f}s")
 
-        if self.use_safety_filter and removed_count > 0:
+        if removed_count > 0:
             print(f"✓ Index contains only high-quality documents (filtered {removed_count} at index-time)")
 
     def retrieve(self, query: str, top_k: int = 3) -> Tuple[List[Dict], List[float], float]:

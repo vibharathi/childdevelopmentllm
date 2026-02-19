@@ -30,8 +30,7 @@ class HybridRetriever(BaseRetriever):
         self,
         model_name: str = RetrievalConfig.EMBEDDING_MODEL,
         bm25_weight: float = RetrievalConfig.HYBRID_BM25_WEIGHT,
-        embedding_weight: float = RetrievalConfig.HYBRID_EMBEDDING_WEIGHT,
-        use_safety_filter: bool = SafetyConfig.ENABLE_SAFETY_FILTER
+        embedding_weight: float = RetrievalConfig.HYBRID_EMBEDDING_WEIGHT
     ):
         """
         Initialize the hybrid retriever.
@@ -40,10 +39,9 @@ class HybridRetriever(BaseRetriever):
             model_name: Sentence-transformer model name (defaults to config)
             bm25_weight: Weight for BM25 scores 0-1 (defaults to config)
             embedding_weight: Weight for embedding scores 0-1 (defaults to config)
-            use_safety_filter: Whether to apply content filtering (defaults to config)
         """
-        # Initialize base retriever (handles safety filter setup)
-        super().__init__(use_safety_filter=use_safety_filter)
+        # Initialize base retriever (safety filter always enabled)
+        super().__init__()
 
         print(f"Loading embedding model: {model_name}...")
         self.model = SentenceTransformer(model_name)
@@ -96,7 +94,7 @@ class HybridRetriever(BaseRetriever):
         elapsed = time.time() - start_time
         print(f"Hybrid indexing complete! Took {elapsed:.2f}s")
 
-        if self.use_safety_filter and removed_count > 0:
+        if removed_count > 0:
             print(f"✓ Index contains only high-quality documents (filtered {removed_count} at index-time)")
 
     def retrieve(self, query: str, top_k: int = RetrievalConfig.DEFAULT_TOP_K) -> Tuple[List[Dict], List[float], float]:

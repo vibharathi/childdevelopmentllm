@@ -41,6 +41,7 @@ class ChildDevelopmentQA:
 
         # Initialize retrieval strategy
         print(f"\n[2/4] Initializing retrieval strategy: {strategy.upper()}...")
+
         if strategy == "embedding":
             # Use ChromaDB for persistent embedding storage
             self.retriever = ChromaRetriever(
@@ -127,7 +128,7 @@ class ChildDevelopmentQA:
         threshold = (
             RetrievalConfig.LOW_CONFIDENCE_THRESHOLD_HYBRID
             if self.strategy == "hybrid"
-            else RetrievalConfig.LOW_CONFIDENCE_THRESHOLD
+            else RetrievalConfig.LOW_CONFIDENCE_THRESHOLD_EMBEDDING
         )
 
         if not retrieved_chunks or scores[0] < threshold:
@@ -246,7 +247,10 @@ def main():
     args = parser.parse_args()
 
     # Initialize system
-    qa_system = ChildDevelopmentQA(model_path=args.model, strategy=args.strategy)
+    qa_system = ChildDevelopmentQA(
+        model_path=args.model,
+        strategy=args.strategy
+    )
 
     # Run in appropriate mode
     if args.question:
