@@ -114,7 +114,7 @@ The dataset includes deliberate inconsistencies to test the system's ability to 
 python src/main.py
 
 # Run with specific retrieval strategy
-python src/main.py --strategy embedding  # or hybrid
+python src/main.py --strategy embedding  <question> # or hybrid 
 
 # Run comparison mode (both strategies)
 python src/main.py --compare
@@ -233,7 +233,7 @@ b. I suggested the use of ChromaDB for the embeddings approach so that the index
 c. I added explicit age-based filtering, which improved the results greatly. 
 c. With a lot of repeated code in both the strategies, I asked it to refactor and extract it into utils. Moved all tests to dedicated test directory.
 d. The initial implementation, was doing query time filtering, which I felt is unnecessary because the noisy documents should not even be persisted in the database. So I requested it to change it to index time filtering instead. 
-e. I ran into an issue where Llama 3.2 was extremely slow on my Mac, so I wrote a benchmark and also enabled GPU acceleration to improve its performance. Also limited token size to 75 to improve the speed from 8 minutes to a few seconds.
+e. I ran into an issue where Llama 3.2 was extremely slow on my Mac, so I wrote a benchmark and also enabled GPU acceleration to improve its performance.
 f. I made sure that constants are not hard-coded and unused code and empty directories are removed. 
 
 That being said, Claude is an excellent partner in coding, and I use it very heavily for all projects. It also acts as a brainstorming partner and teacher. However, it is important to check its work as it tends to produce too much redundant code which could affect performance. I also need to continually make sure to whet its design choices, break down work into digestable chunks and add sufficient tests. 
