@@ -30,7 +30,7 @@ class LLMConfig:
     NUM_THREADS = 4  # Number of CPU threads for inference
 
     # Generation parameters
-    MAX_TOKENS = 75  # Reduced for faster generation (~8-9 min on CPU)
+    MAX_TOKENS = 200  # GPU-accelerated generation; 200 tokens fits 2-4 complete sentences
     TEMPERATURE = 0.3  # Low temperature for factual, deterministic answers
 
     # Temperature guidelines:

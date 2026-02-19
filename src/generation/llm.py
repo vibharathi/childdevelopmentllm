@@ -122,7 +122,7 @@ class LocalLLM:
             Generated answer
         """
         # Use simple Q&A format which works better than chat format for this model
-        prompt = f"""Answer the following question based on the provided context about child development.
+        prompt = f"""Write a complete sentence answering the following question based on the provided context about child development.
 
 Context: {context}
 

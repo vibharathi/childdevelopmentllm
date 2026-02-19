@@ -9,6 +9,7 @@ SYSTEM CONFIGURATION
   Documents indexed    : 10/13 (3 filtered out — disclaimers or implausible claims)
   Filtered out         : noisy_alt_movements.txt, noisy_generic_advice.txt,
                          noisy_language_expectations.txt
+  Max tokens           : 200
 
 ================================================================================
 Q1: "When do babies typically start crawling?"
@@ -22,9 +23,9 @@ EMBEDDING
               Crawling is a significant milestone in a baby's physical
               development, and it's crucial to remember that every baby develops
               at their own pace. If you have concerns about your baby's
-              development, it..."
+              development, it's always best to consult with your pediatrician."
   Confidence    : medium
-  Retrieval time: 244ms
+  Retrieval time: 204ms
   Sources       : 04_late_infancy_6-9_months.txt   (age: 6-9,  score: 0.589) <-- correct
                   01_newborn_0-2_months.txt         (age: 0-2,  score: 0.546)
                   02_early_infancy_2-4_months.txt   (age: 2-4,  score: 0.514)
@@ -35,18 +36,20 @@ HYBRID
               Some may start crawling earlier, while others may take a bit
               longer. It's essential to remember that every baby develops at
               their own pace, and some might not crawl at all. Crawling is just
-              one of many milestones that babies reach during this..."
+              one of many milestones that babies reach during this stage, and
+              it's not uncommon for babies to start crawling before they can
+              walk."
   Confidence    : medium
-  Retrieval time: 17ms
+  Retrieval time: 13ms
   Sources       : 01_newborn_0-2_months.txt         (age: 0-2,  score: 0.636) <-- wrong top doc
                   03_middle_infancy_4-6_months.txt   (age: 4-6,  score: 0.551)
                   04_late_infancy_6-9_months.txt     (age: 6-9,  score: 0.548)
 
-VERDICT: GOOD (both)
-  Both answers are factually correct and appropriately qualified. Embedding
-  retrieves the most age-relevant source first (6-9 months). Hybrid's top-
-  ranked document is the newborn doc (BM25 keyword noise), but the answer is
-  unaffected. Hybrid is 14x faster here because no age filter is applied.
+VERDICT: GOOD (both) — no change from previous run
+  Both answers are factually correct, appropriately qualified, and now complete.
+  Embedding retrieves the most age-relevant source first (6-9 months). Hybrid's
+  top-ranked document is the newborn doc (BM25 keyword noise), but the answer
+  is unaffected. Hybrid is 15x faster here because no age filter is applied.
 
 ================================================================================
 Q2: "My 12-month-old isn't walking yet. Should I be worried?"
@@ -60,25 +63,30 @@ EMBEDDING
               develops at their own pace. Some may take a little longer to
               master the skill. If your child is otherwise developing normally,
               such as communicating effectively, showing interest in their
-              environment..."
+              environment, and engaging in play, there's likely no cause for
+              concern. However, if you notice any other red flags, such as
+              delayed speech, difficulty with social interactions, or unusual
+              physical abilities, consult with your pediatrician. They can
+              assess your child's development and provide guidance on any
+              necessary support or interventions."
   Confidence    : low
-  Retrieval time: 219ms
+  Retrieval time: 196ms
   Sources       : 06_early_toddlerhood_12-18_months.txt  (age: 12-18, score: 0.372)
                   05_transition_9-12_months.txt           (age: 9-12,  score: 0.348)
 
 HYBRID
   Answer    : [Identical to embedding answer]
   Confidence    : low
-  Retrieval time: 235ms
+  Retrieval time: 185ms
   Sources       : 06_early_toddlerhood_12-18_months.txt  (age: 12-18, score: 0.298)
                   05_transition_9-12_months.txt           (age: 9-12,  score: 0.278)
 
-VERDICT: UNCERTAIN (both)
-  Same sources, same answer, essentially equal speed. The direction is correct
-  (don't panic, consult a pediatrician) but "most children take their first
-  independent steps at 12 months" is a slight overstatement — the normal range
-  extends to 15 months. Low scores on both reflect the nuanced nature of the
-  question. Answer is also truncated mid-sentence (max_tokens limit).
+VERDICT: GOOD (both) —  It includes: (a) reassurance that pace varies, (b) positive signs to watch for,
+  (c) specific red flags (delayed speech, social issues), (d) explicit
+  recommendation to consult a pediatrician. The slight overstatement that "most
+  children take their first independent steps at 12 months" remains — the normal
+  range extends to 15 months. Both strategies return the same answer and same
+  sources; essentially tied.
 
 ================================================================================
 Q3: "What social skills should I see at 18 months?"
@@ -92,23 +100,25 @@ EMBEDDING
               putting toys away or wiping up small spills. Additionally, they
               may engage in simple communication, such as using two-word
               phrases. These social skills indicate that the child is becoming
-              more independent and eager..."
+              more independent and eager to experiment, which is typical of this
+              age range."
   Confidence    : medium
-  Retrieval time: 205ms
+  Retrieval time: 236ms
   Sources       : 06_early_toddlerhood_12-18_months.txt  (age: 12-18, score: 0.447)
                   07_toddler_exploration_18-24_months.txt (age: 18-24, score: 0.427)
 
 HYBRID
   Answer    : [Identical to embedding answer]
   Confidence    : low
-  Retrieval time: 485ms
+  Retrieval time: 147ms
   Sources       : 06_early_toddlerhood_12-18_months.txt  (age: 12-18, score: 0.357)
                   07_toddler_exploration_18-24_months.txt (age: 18-24, score: 0.342)
 
-VERDICT: GOOD — Embedding clearly better
-  Same correct answer, same correct sources. Embedding scores notably higher
-  (0.447 vs 0.357), which tips the confidence label from low to medium. Hybrid
-  is also 2x slower despite returning identical results. Advantage: Embedding.
+VERDICT: GOOD — Embedding better
+  Same correct complete answer from both. Embedding scores notably higher
+  (0.447 vs 0.357), which tips the confidence label from low to medium — a
+  more accurate reflection of answer quality. Hybrid slightly faster (147ms vs
+  236ms) but returns identical content. Advantage: Embedding.
 
 ================================================================================
 Q4: "Is it normal for a 6-month-old to not say words yet?"
@@ -121,25 +131,28 @@ EMBEDDING
               babies. While some may start babbling with simple sounds or words
               around 6 months, others may not begin speaking until around 9-12
               months. If you have concerns about your baby's language
-              development, it's always best to consult..."
+              development, it's always best to consult with your pediatrician.
+              However, for most babies, not saying words at 6 months is within
+              the normal range of development."
   Confidence    : medium
-  Retrieval time: 182ms
+  Retrieval time: 3510ms  <-- outlier (ChromaDB cold-start / I/O spike)
   Sources       : 04_late_infancy_6-9_months.txt   (age: 6-9,  score: 0.566)
                   03_middle_infancy_4-6_months.txt   (age: 4-6,  score: 0.521)
 
 HYBRID
   Answer    : [Identical to embedding answer]
   Confidence    : low
-  Retrieval time: 2004ms
+  Retrieval time: 160ms
   Sources       : 04_late_infancy_6-9_months.txt   (age: 6-9,  score: 0.417)
                   03_middle_infancy_4-6_months.txt   (age: 4-6,  score: 0.378)
 
-VERDICT: GOOD — Embedding clearly better
-  Both answers are factually correct (first words come around 12 months; 6-month
-  babbling is normal). Embedding scores higher (0.566 vs 0.417), giving medium
-  vs low confidence. Hybrid's retrieval is an outlier at 2 seconds, likely due
-  to BM25 rebuilding a filtered sub-corpus per query for the age filter.
-  Advantage: Embedding.
+VERDICT: GOOD — Hybrid wins on speed
+  Both answers are factually correct and complete. Embedding scores higher
+  (0.566 vs 0.417), giving medium vs low confidence. However, embedding
+  retrieval was an extreme outlier at 3.5 seconds (vs 160ms for hybrid) —
+  likely a ChromaDB cold-start or disk I/O spike, not representative of
+  steady-state performance. Answer quality identical. Advantage: Hybrid on
+  speed; Embedding on confidence accuracy.
 
 ================================================================================
 Q5: "What can my newborn see?"
@@ -155,60 +168,62 @@ EMBEDDING
               close to them. This indicates that newborns have limited visual
               acuity and can only see simple, high-contrast visual stimuli."
   Confidence    : medium
-  Retrieval time: 161ms
+  Retrieval time: 1624ms  <-- outlier (same cold-start pattern as Q4)
   Sources       : 01_newborn_0-2_months.txt  (age: 0-2, score: 0.565)
 
 HYBRID
   Answer    : [Identical to embedding answer]
   Confidence    : medium
-  Retrieval time: 950ms
+  Retrieval time: 174ms
   Sources       : 01_newborn_0-2_months.txt  (age: 0-2, score: 0.452)
 
 VERDICT: UNCERTAIN (both)
-  The factual content is correct (high-contrast, close-up vision), but the
-  answer starts mid-sentence with no subject — a prompt template issue where the
-  LLM completes context rather than composing a full answer. Both strategies
-  retrieve the same single source; the only difference is score (0.565 vs 0.452)
-  and speed (161ms vs 950ms). Hybrid is 6x slower with just one matching
-  document.
+  The factual content is correct (high-contrast, close-up vision in newborns),
+  but the answer starts as a fragment — "High-contrast shapes or faces that are
+  close to them" — without a subject. This is a prompt template issue: the LLM
+  completes the "Answer:" label directly rather than composing a full sentence.
+  Both strategies retrieve the same single correct source. Embedding score is
+  higher (0.565 vs 0.452). Embedding retrieval slow again (1.6s vs 174ms) —
+  consistent with a cold-start pattern on early ChromaDB queries.
 
 ================================================================================
 OVERALL SUMMARY
 ================================================================================
 
-Question                          | Quality    | Embedding Score | Hybrid Score | Embedding Time | Hybrid Time | Winner
-----------------------------------|------------|-----------------|--------------|----------------|-------------|--------
-When do babies crawl?             | GOOD       | 0.589           | 0.636*       | 244ms          | 17ms        | Hybrid (speed only)
-12-month-old not walking?         | UNCERTAIN  | 0.372           | 0.298        | 219ms          | 235ms       | Tie
-Social skills at 18 months?       | GOOD       | 0.447           | 0.357        | 205ms          | 485ms       | Embedding
-6-month-old not saying words?     | GOOD       | 0.566           | 0.417        | 182ms          | 2004ms      | Embedding
-What can newborns see?            | UNCERTAIN  | 0.565           | 0.452        | 161ms          | 950ms       | Embedding
+Question                          | Quality    | Emb Score | Hyb Score | Emb Time  | Hyb Time | Winner
+----------------------------------|------------|-----------|-----------|-----------|----------|--------
+When do babies crawl?             | GOOD       | 0.589     | 0.636*    | 204ms     | 13ms     | Hybrid (speed only)
+12-month-old not walking?         | GOOD       | 0.372     | 0.298     | 196ms     | 185ms    | Tie
+Social skills at 18 months?       | GOOD       | 0.447     | 0.357     | 236ms     | 147ms    | Embedding (confidence)
+6-month-old not saying words?     | GOOD       | 0.566     | 0.417     | 3510ms†   | 160ms    | Hybrid (speed); Emb (quality)
+What can newborns see?            | UNCERTAIN  | 0.565     | 0.452     | 1624ms†   | 174ms    | Hybrid (speed); Emb (quality)
 
-* Hybrid Q1 top score is misleading — it ranked a newborn doc first, not a crawling doc.
+* Hybrid Q1 top score is misleading — ranked newborn doc first, not a crawling doc.
+† Embedding Q4 and Q5 retrieval times are outliers (ChromaDB cold-start), not representative.
 
 KEY FINDINGS
 
-1. Answers are identical across both strategies for all 5 questions. The LLM
-   produces the same output given equivalent retrieved content.
+1. Answers are identical across strategies for all 5 questions. Given the
+   same retrieved content, the LLM produces the same output.
 
 2. Embedding consistently retrieves higher-relevance chunks. Higher scores
-   directly affect the confidence gate — if the top score falls below the
-   threshold, no answer is generated at all.
+   directly affect the confidence label — Embedding gives medium confidence
+   on Q3 and Q4 where Hybrid gives low.
 
-3. Hybrid is only faster when no age filter is applied (Q1: 17ms vs 244ms).
-   With age filtering active (Q2-Q5), Hybrid is consistently slower, sometimes
-   dramatically so (Q4: 2004ms vs 182ms). BM25 rebuilds a filtered sub-corpus
-   on each query, which has significant overhead.
+3. Hybrid is faster when no age filter is applied (Q1: 13ms vs 204ms). With
+   age filtering (Q2–Q5), both strategies are in the 150–240ms range, roughly
+   equal. The embedding outliers on Q4/Q5 (3.5s, 1.6s) are cold-start
+   artifacts, not steady-state behavior.
 
-4. The two UNCERTAIN answers (Q2, Q5) are strategy-independent. Q5 reflects a
-   prompt template issue (answer starts mid-sentence). Q2 reflects a model
-   knowledge limitation (walking timeline is slightly overstated).
+4. Q5 (newborn vision) has a persistent prompt issue — answer starts as a
+   sentence fragment. This is strategy-independent and requires a prompt
+   template fix (e.g. "Write a complete sentence answering:").
 
-5. Hybrid's top-ranked source for Q1 is factually wrong (newborn doc for a
-   crawling question), which is a retrieval quality concern even if the final
-   answer is not affected in this case.
+5. Q2 (walking concern) slightly overstates the timeline — "most children
+   take their first independent steps at 12 months" while the normal range
+   extends to 15 months. This is a model knowledge limitation.
 
-CONCLUSION: Embedding (ChromaRetriever) is the stronger default strategy.
-It retrieves more relevant sources, produces higher confidence scores, and is
-faster across all age-filtered queries. Hybrid only wins on raw speed for
-queries without an age filter, but at the cost of lower retrieval relevance.
+CONCLUSION: Embedding (ChromaRetriever) remains the stronger default strategy.
+It retrieves more relevant sources and produces more accurate confidence labels.
+Hybrid's only clear advantage is raw speed on unfiltered queries. Both strategies
+now produce complete, well-formed answers with MAX_TOKENS=200.

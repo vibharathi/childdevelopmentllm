@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-02-18T18:35:32.671162",
+  "timestamp": "2026-02-18T19:18:47.021060",
   "test_results": [
     {
       "strategy": "embedding",
@@ -7,9 +7,9 @@
         {
           "question": "When do babies typically start crawling?",
           "category": "Motor Development",
-          "answer": "Between six and nine months, many babies begin showing early attempts at crawling. However, it's essential to note that some babies may start crawling earlier or later than this age range. Crawling is a significant milestone in a baby's physical development, and it's crucial to remember that every baby develops at their own pace. If you have concerns about your baby's development, it",
+          "answer": "Between six and nine months, many babies begin showing early attempts at crawling. However, it's essential to note that some babies may start crawling earlier or later than this age range. Crawling is a significant milestone in a baby's physical development, and it's crucial to remember that every baby develops at their own pace. If you have concerns about your baby's development, it's always best to consult with your pediatrician.",
           "confidence": "medium",
-          "retrieval_time_ms": 244.25005912780762,
+          "retrieval_time_ms": 203.81808280944824,
           "sources": [
             {
               "filename": "04_late_infancy_6-9_months.txt",
@@ -31,9 +31,9 @@
         {
           "question": "My 12-month-old isn't walking yet. Should I be worried?",
           "category": "Developmental Concern",
-          "answer": "At 12 months, most children take their first independent steps. If your child is not walking yet, it's worth discussing with your pediatrician. However, it's essential to remember that every child develops at their own pace. Some may take a little longer to master the skill. If your child is otherwise developing normally, such as communicating effectively, showing interest in their environment",
+          "answer": "At 12 months, most children take their first independent steps. If your child is not walking yet, it's worth discussing with your pediatrician. However, it's essential to remember that every child develops at their own pace. Some may take a little longer to master the skill. If your child is otherwise developing normally, such as communicating effectively, showing interest in their environment, and engaging in play, there's likely no cause for concern. However, if you notice any other red flags, such as delayed speech, difficulty with social interactions, or unusual physical abilities, consult with your pediatrician. They can assess your child's development and provide guidance on any necessary support or interventions.",
           "confidence": "low",
-          "retrieval_time_ms": 219.06518936157227,
+          "retrieval_time_ms": 196.26307487487793,
           "sources": [
             {
               "filename": "06_early_toddlerhood_12-18_months.txt",
@@ -50,9 +50,9 @@
         {
           "question": "What social skills should I see at 18 months?",
           "category": "Social Development",
-          "answer": "At 18 months, toddlers engage in simple imitation, such as pretending to talk on a toy phone or copying household routines. They also show interest in helping with simple tasks, such as putting toys away or wiping up small spills. Additionally, they may engage in simple communication, such as using two-word phrases. These social skills indicate that the child is becoming more independent and eager",
+          "answer": "At 18 months, toddlers engage in simple imitation, such as pretending to talk on a toy phone or copying household routines. They also show interest in helping with simple tasks, such as putting toys away or wiping up small spills. Additionally, they may engage in simple communication, such as using two-word phrases. These social skills indicate that the child is becoming more independent and eager to experiment, which is typical of this age range.",
           "confidence": "medium",
-          "retrieval_time_ms": 204.8509120941162,
+          "retrieval_time_ms": 235.63075065612793,
           "sources": [
             {
               "filename": "06_early_toddlerhood_12-18_months.txt",
@@ -69,9 +69,9 @@
         {
           "question": "Is it normal for a 6-month-old to not say words yet?",
           "category": "Language Development",
-          "answer": "Yes, it is normal for a 6-month-old to not say words yet. At this stage, language development can vary significantly among babies. While some may start babbling with simple sounds or words around 6 months, others may not begin speaking until around 9-12 months. If you have concerns about your baby's language development, it's always best to consult",
+          "answer": "Yes, it is normal for a 6-month-old to not say words yet. At this stage, language development can vary significantly among babies. While some may start babbling with simple sounds or words around 6 months, others may not begin speaking until around 9-12 months. If you have concerns about your baby's language development, it's always best to consult with your pediatrician. However, for most babies, not saying words at 6 months is within the normal range of development.",
           "confidence": "medium",
-          "retrieval_time_ms": 181.71191215515137,
+          "retrieval_time_ms": 3510.2760791778564,
           "sources": [
             {
               "filename": "04_late_infancy_6-9_months.txt",
@@ -90,7 +90,7 @@
           "category": "Early Infancy",
           "answer": "High-contrast shapes or faces that are close to them.\n\nExplanation: This answer is based on the provided context, which states that newborns begin showing brief periods of alertness, during which they focus on high-contrast shapes or faces that are close to them. This indicates that newborns have limited visual acuity and can only see simple, high-contrast visual stimuli.",
           "confidence": "medium",
-          "retrieval_time_ms": 161.4820957183838,
+          "retrieval_time_ms": 1624.4940757751465,
           "sources": [
             {
               "filename": "01_newborn_0-2_months.txt",
@@ -107,9 +107,9 @@
         {
           "question": "When do babies typically start crawling?",
           "category": "Motor Development",
-          "answer": "Typically, babies start crawling between six and nine months of age. However, the exact timing can vary from one child to another. Some may start crawling earlier, while others may take a bit longer. It's essential to remember that every baby develops at their own pace, and some might not crawl at all. Crawling is just one of many milestones that babies reach during this",
+          "answer": "Typically, babies start crawling between six and nine months of age. However, the exact timing can vary from one child to another. Some may start crawling earlier, while others may take a bit longer. It's essential to remember that every baby develops at their own pace, and some might not crawl at all. Crawling is just one of many milestones that babies reach during this stage, and it's not uncommon for babies to start crawling before they can walk.",
           "confidence": "medium",
-          "retrieval_time_ms": 17.46392250061035,
+          "retrieval_time_ms": 13.08894157409668,
           "sources": [
             {
               "filename": "01_newborn_0-2_months.txt",
@@ -131,9 +131,9 @@
         {
           "question": "My 12-month-old isn't walking yet. Should I be worried?",
           "category": "Developmental Concern",
-          "answer": "At 12 months, most children take their first independent steps. If your child is not walking yet, it's worth discussing with your pediatrician. However, it's essential to remember that every child develops at their own pace. Some may take a little longer to master the skill. If your child is otherwise developing normally, such as communicating effectively, showing interest in their environment",
+          "answer": "At 12 months, most children take their first independent steps. If your child is not walking yet, it's worth discussing with your pediatrician. However, it's essential to remember that every child develops at their own pace. Some may take a little longer to master the skill. If your child is otherwise developing normally, such as communicating effectively, showing interest in their environment, and engaging in play, there's likely no cause for concern. However, if you notice any other red flags, such as delayed speech, difficulty with social interactions, or unusual physical abilities, consult with your pediatrician. They can assess your child's development and provide guidance on any necessary support or interventions.",
           "confidence": "low",
-          "retrieval_time_ms": 235.46218872070312,
+          "retrieval_time_ms": 184.67187881469727,
           "sources": [
             {
               "filename": "06_early_toddlerhood_12-18_months.txt",
@@ -150,9 +150,9 @@
         {
           "question": "What social skills should I see at 18 months?",
           "category": "Social Development",
-          "answer": "At 18 months, toddlers engage in simple imitation, such as pretending to talk on a toy phone or copying household routines. They also show interest in helping with simple tasks, such as putting toys away or wiping up small spills. Additionally, they may engage in simple communication, such as using two-word phrases. These social skills indicate that the child is becoming more independent and eager",
+          "answer": "At 18 months, toddlers engage in simple imitation, such as pretending to talk on a toy phone or copying household routines. They also show interest in helping with simple tasks, such as putting toys away or wiping up small spills. Additionally, they may engage in simple communication, such as using two-word phrases. These social skills indicate that the child is becoming more independent and eager to experiment, which is typical of this age range.",
           "confidence": "low",
-          "retrieval_time_ms": 485.076904296875,
+          "retrieval_time_ms": 147.23491668701172,
           "sources": [
             {
               "filename": "06_early_toddlerhood_12-18_months.txt",
@@ -169,9 +169,9 @@
         {
           "question": "Is it normal for a 6-month-old to not say words yet?",
           "category": "Language Development",
-          "answer": "Yes, it is normal for a 6-month-old to not say words yet. At this stage, language development can vary significantly among babies. While some may start babbling with simple sounds or words around 6 months, others may not begin speaking until around 9-12 months. If you have concerns about your baby's language development, it's always best to consult",
+          "answer": "Yes, it is normal for a 6-month-old to not say words yet. At this stage, language development can vary significantly among babies. While some may start babbling with simple sounds or words around 6 months, others may not begin speaking until around 9-12 months. If you have concerns about your baby's language development, it's always best to consult with your pediatrician. However, for most babies, not saying words at 6 months is within the normal range of development.",
           "confidence": "low",
-          "retrieval_time_ms": 2004.1847229003906,
+          "retrieval_time_ms": 160.19010543823242,
           "sources": [
             {
               "filename": "04_late_infancy_6-9_months.txt",
@@ -190,7 +190,7 @@
           "category": "Early Infancy",
           "answer": "High-contrast shapes or faces that are close to them.\n\nExplanation: This answer is based on the provided context, which states that newborns begin showing brief periods of alertness, during which they focus on high-contrast shapes or faces that are close to them. This indicates that newborns have limited visual acuity and can only see simple, high-contrast visual stimuli.",
           "confidence": "medium",
-          "retrieval_time_ms": 949.7289657592773,
+          "retrieval_time_ms": 174.25894737243652,
           "sources": [
             {
               "filename": "01_newborn_0-2_months.txt",
