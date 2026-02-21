@@ -1,6 +1,6 @@
 # Child Development LLM - Caregiver Q&A System
 
-A local prototype that answers caregiver questions about early childhood development (birth to 36 months) using retrieval-augmented generation (RAG).
+A local prototype that answers caregiver questions about early childhood development (birth to 36 months) using retrieval-augmented generation (RAG). Only uses local models - no cloud calls to Open AI/Anthropic models etc.
 
 ## Overview
 
