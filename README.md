@@ -222,27 +222,6 @@ Please try asking about developmental milestones for children aged 0-36 months."
 ## Comparison with 5 sample questions and verdict on each result for both strategies
 [Comparison and Verdict for 5 sample questions](Comparison_and_Verdict_for_five_sample_questions.txt)
 
-## Notes on AI Usage
-I used Claude Code for this project. Initial prompt was the project specification that was provided; however, I made many improvements along the way, as can be seen in the commit history. 
-- Its initial choice of the Tiny Llama model was not good, as it was making a lot of spelling mistakes and giving very short and sometimes unrelated answers. I switched the model to Llama 3.2.
-- Noisiness was being detected by the file name, but it should be detected by the content instead. I added a content filter which looks at things like implausible claims, keywords, etc.
-- I suggested the use of ChromaDB for the embeddings approach so that the indexing can be preserved across sessions.
-- I added explicit age-based filtering, which improved the results greatly. It also only added age-based filtering to Chroma Retriever not Hybrid Retriever thus skewing the results, which I debugged and caught.
-- With a lot of repeated code in both the strategies, I asked it to refactor and extract it into utils. Moved all tests to dedicated test directory.
-- The initial implementation, was doing query time filtering, which I felt is unnecessary because the noisy documents should not even be persisted in the database. So I requested it to change it to index time filtering instead.
-- I ran into an issue where Llama 3.2 was extremely slow on my Mac, so I wrote a benchmark and also enabled GPU acceleration to improve its performance.
-- I made sure that constants are not hard-coded and unused code and empty directories are removed.
-
-That being said, Claude is an excellent partner in coding, and I use it very heavily for all projects. However, its best to have it explain and run design choices by you, break its work down into digestable chunks. While making big design changes, it might forget to make it in all places, so that is another thing to watch for. Lastly it produces a lot of repeated code and is verbose in general, so having it do a round of cleanup in the end - refactor, remove redundancies, make constants etc.
-
-## Future Improvements
-
-- [ ] Expand age range coverage (36-60 months for preschool)
-- [ ] Web interface with visual milestone tracking
-- [ ] Mobile app version
-- [ ] Stronger test suite and eval framework
-- [ ] Try other embedding models and ranking/merging strategies.
-
 ## License
 
 MIT License - See LICENSE file for details
